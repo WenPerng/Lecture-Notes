@@ -1,0 +1,37 @@
+\subsection{Tradeoffs of Group Testing}
+\lecture{13 May}
+
+As a final remark to group testing, let us consider the tradeoffs between the five dimensions of group testing:
+\begin{enumerate}
+    \item Non-adaptive / adaptive: The group testing is done a single round for non-adaptive ones. For adaptive ones it can be done with multiple round, and future rounds can utilize the knowledge gained from past rounds.
+    \item The number of tests $m$: we often want $m=O(k\log n)$ since it is the information-theoretic bound. In reality, it might be hard to reach.
+    \item Noisy / noiseless: whether you can trust the test results.
+    \item Decode complexity: we want it to be $O(k\log n)$, $O(k\,\mathrm{polylog}\,n)$, or $\mathrm{poly}(k\log n)$.
+    \item Number of false positives and false negative (\#FP \& FN): should be $O(1)$ or $o(k)$.
+\end{enumerate}
+Our preferred combination would be to have a nonadaptive noiseless group testing with $O(k\log n)$ tests, $O(k\,\mathrm{polylog}\,n)$ decoding complexity, and 0 FN \& FP with high probability.
+
+The current state of the art can only achieve any combination of four of the above, but never all five.
+\begin{enumerate}
+    \item If we give up the first:
+
+
+    \item If we give up the second:
+
+
+    \item If we give up the third:
+
+
+    \item If we give up the fourth:
+
+
+    \item If we give up the fifth:
+
+    
+\end{enumerate}
+
+\section{Distributed Matrix Multiplication}
+
+\begin{remark}
+    Interestingly enough, just a few days after the lecture, the team of Google Deepmind published a result on fast matrix multiplication from their AI AlphaTensor on 15th of May, 2025. The traditional method of multiplying a $4\times4$ matrix using the Strassen method requires $49$ scalar multiplications. Amazingly, the method proposed by Deepmind requires only $48$ scalar multiplications! What a breakthrough.
+\end{remark}

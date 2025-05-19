@@ -1,0 +1,403 @@
+\section{Algebra of Finite Fields}
+\lecture{14 Apr.}
+\lecture{Birthday}
+
+Reed--Solomon codes are really useful and we would like to extend it from $\mathbb{F}_p$ to more general fields of order (size) $q=p^d$. Henceforth, some algebra is needed as prior knowledge. For more details, please refer to the book ``Essential Coding Theory'' \cite{Essential_Coding_Theory}.
+
+As one already knows, a field $\mathbb{F}$ is a set with the usual addition, subtraction, multiplication, division, zero element, and multiplicative identity. A finite field is a field with finite elements. Finite fields are often called Galois fields, denoted by $\mathrm{GF}(q)$. Some common examples of a field are the usual $\mathbb{R}$, $\mathbb{C}$, and $\mathbb{F}_p \cong \mathbb{Z}_p$ where $p$ is a prime.
+
+\begin{definition}[Character]
+    The character of a field is defined as
+    \begin{equation}
+        \mathrm{char}\,\mathbb{F}\defeq \text{the smallest positive integer $c$ such that }\underbrace{1+1+\cdots+1}_{c\text{ copies}}=0.
+    \end{equation}
+\end{definition}
+\begin{example}
+    \begin{itemize}
+        \item We have $\mathrm{char}\,\mathbb{C} = \infty$ and $\mathrm{char}\,\mathbb{R}=\infty$, they are termed \textit{characteristic-zero fields}.
+        \item $\mathrm{char}\,\mathrm{GF}(p)=p$.
+    \end{itemize}
+\end{example}
+
+\begin{theorem}
+    For a finite field $\mathbb{F}$, $\mathrm{char}\,\mathbb{F}$ is a prime.
+\end{theorem}
+\begin{proof}
+    If we have $\mathrm{char}\,\mathbb{F}=ab$ as a product of two integers $a$ and $b$ bigger than $1$, then
+    \begin{equation*}
+        0 = \underbrace{1+1+\cdots+1}_{\times ab} = \underbrace{(1+\cdots+1)}_{\times a} \cdot \underbrace{(1+\cdots+1)}_{\times b},
+    \end{equation*}
+    meaning that one of $a$ and $b$ cannot have their inverse defined: $1\cdot b = a^{-1} a b = a^{-1}0 = 0$. Thus, a contradiction is met, $\mathrm{char}\,\mathbb{F}$ can only be zero or prime.
+\end{proof}
+
+\begin{definition}[Base Field]
+    For any $\mathbb{F}$, if $\mathrm{char}\,\mathbb{F}>0$, the field $\mathrm{GF(\mathrm{char}\,\mathbb{F})}$ is termed the \textit{base field}, or the \textit{prime subfield} of $\mathbb{F}$.
+\end{definition}
+If we treat $\mathbb{F}$ as a vector space, then its base field is like the field the vector space is defined on. See the theorem below for a complete statement. For more details, refer to \autoref{thm:w9_gen_fin_field}.
+
+\begin{theorem}
+    For any field $\mathbb{F}$, we have its order (size) being $\abs{\mathbb{F}} = p^n$, where $\mathrm{char}\,\mathbb{F}=p$ and $n$ is the dimension of $\mathbb{F}$ over its base field $\mathrm{GF}(p)$. We have $\mathbb{F}\cong\mathrm{GF}(p)^n$ as a vector space.
+\end{theorem}
+
+\begin{definition}
+    The set $\mathrm{GF}(p)[x]$ is the polynomials in $x$ with coefficients in $\mathrm{GF}(p)$. We say that $f\in\mathrm{GF}(p)[x]$, or that $f$ is a polynomial over $\mathrm{GF}(p)$.
+\end{definition}
+
+\begin{definition}[Reducibility]
+    A polynomial $f\in\mathrm{GF}(p)[x]$ is \textit{reducible} if there exists polynomials $g$, $h\in\mathrm{GF}(p)[x]$ with $\deg g$, $\deg h>0$, such that $f=gh$. Else, the polynomial is called \textit{irreducible}.
+\end{definition}
+\begin{example}
+    \begin{itemize}
+        \item The polynomial $x^2+1$ over $\mathrm{GF}(2)$ is reducible, since $(x+1)^2 = x^2+2x+1=x^2+1$.
+        \item The polynomial $x^2+x+1$ over $\mathrm{GF}(2)$ can be shown to be irreducible by enumerating all possibilities.
+    \end{itemize}
+\end{example}
+
+\subsection{Constructing a Finite Field}
+It is interesting to note that every time when we have an irreducible polynomial over a field, we can construct another finite field! Our end goal is to construct, from $\mathrm{GF}(p)$ where $p$ is prime, into a general field $\mathrm{GF}(q)$ where $q=p^n$, showing its existence and uniqueness. The construction procedure is as below
+
+\begin{definition}[Companion Matrix]
+    Given a polynomial
+    \begin{equation}
+        f(x) = a_0 + a_1x + a_2x^2 + \cdots + a_{d-1}x^{d-1} + x^d \in \mathrm{GF}(p)[x],
+    \end{equation}
+    the companion matrix of $f$ is defined as
+    \begin{equation}
+        A = \left[\begin{matrix}
+            0 & 0 & & & -a_0 \\
+            1 & 0 & & & -a_1 \\
+            0 & 1 & \ddots & & \vdots \\
+            & & \ddots & 0 & -a_{d-2} \\
+            & & & 1 & -a_{d-1}
+        \end{matrix}\right] \in \mathrm{GF}(p)^{d\times d},
+    \end{equation}
+    with the right-most column containing the negative coefficients to $f$, the lower-left triangular containing an identity matrix of size $(d-1)\times(d-1)$, and the remaining entries all being 0.
+\end{definition}
+
+\begin{theorem}
+    Let the companion matrix of the polynomial $f$ be denoted by $A$. The characteristic polynomial of $A$ is equal to $f$.
+\end{theorem}
+\begin{proof}
+    This can be directly shown by computing the characteristic polynomial from definition: $\det(\lambda\mathbbm{1}-A)$. But we will show another method here. Observe the powers to $A$:
+    \begin{align*}
+        &A^0 = \left[\begin{matrix}
+            1 &   &        &   &   \\
+              & 1 &        &   &   \\
+              &   & \ddots &   &   \\
+              &   &        & 1 &   \\
+              &   &        &   & 1
+        \end{matrix}\right],
+        A^1 = \left[\begin{matrix}
+            0 &   &        &   & -a_0     \\
+            1 & 0 &        &   & -a_1     \\
+              & 1 & \ddots &   & \vdots  \\
+              &   & \ddots & 0 & -a_{d-2} \\
+              &   &        & 1 & -a_{d-1}
+        \end{matrix}\right],
+        A^2 = \left[\begin{matrix}
+            0 &   &        &   & -a_0     & * \\
+            0 & 0 &        &   & -a_1     & * \\
+            1 & 0 & \ddots & 0 & \vdots  & * \\
+              & 1 & \ddots & 0 & -a_{d-2} & * \\
+              &   &        & 1 & -a_{d-1} & *
+        \end{matrix}\right], \\
+        &\ldots, A^{d-1} = \left[\begin{matrix}
+            0      & -a_0     & * & \cdots & * \\
+            0      & -a_1     & * & \cdots & * \\
+            \vdots & \vdots  & * & \cdots & * \\
+            0      & -a_{d-2} & * & \cdots & * \\
+            1      & -a_{d-1} & * & \cdots & *
+        \end{matrix}\right],
+        A^d = \left[\begin{matrix}
+            -a_0      & * & \cdots & * & * \\
+            -a_1      & * & \cdots & * & * \\
+            \vdots   & * & \cdots & * & * \\
+            -a_{d-2}  & * & \cdots & * & * \\
+            -a_{d-1}  & * & \cdots & * & * 
+        \end{matrix}\right].
+    \end{align*}
+    From the Cayley--Hamilton theorem, we know that the characteristic polynomial, and that $A^{d}$ can be represented as a linear combination of $A^0$ to $A^{d-1}$. Comparing the coefficients to the first column, we can immediately see that
+    \begin{equation*}
+        A^{d} = -a_0 A^0 - a_1 A^1 - a_2 A^2 - \cdots - a_{d-1} A^{d-1}.
+    \end{equation*}
+    Hence it is shown.
+\end{proof}
+
+\begin{remark}
+    In MATLAB and many other mathematical programs, given a polynomial $f$, a simple method for finding the roots to $f$ is to first construct its companion matrix $A$, then find the eigenvalues to $A$. The eigenvalues of $A$ are identical to the roots of $f$.
+\end{remark}
+
+\begin{theorem}\label{thm:w9_gen_fin_field}
+    Given an irreducible polynomial $f$ over $\mathrm{GF}(p)$, let the companion matrix of $f$ be denoted by $A$, then the set
+    \begin{equation}
+        \mathcal{F} \defeq \setdef{b_0 + b_1 A + \cdots + b_mA^m}{b_i\in\mathrm{GF}(p), m>0} \subseteq \mathrm{GF}(p)^{d\times d}
+    \end{equation}
+    is a finite field of order $p^d$.
+\end{theorem}
+\begin{proof}
+    First of all, again by Cayley--Hamilton theorem, $A^d$ can be represented as a degree $d-1$ polynomial of $A$, hence, we can restrict $m\le d-1$. The set $\mathcal{F}$ is thus finite. Next, we need to check the closure of the four operations.
+    \begin{itemize}
+        \item Both addition and subtraction are trivial.
+        \item Multiplication is just the convolution of coefficients, with suitable application of the Cayley--Hamilton theorem from time to time.
+        \item Division is more involved: Let us first consider how division works in $\mathrm{GF}(p)$. For the first few integers, division (finding their inverse) is easy, we have
+        \begin{align*}
+            \frac{1}{2} &= \frac{p+1}{2}, \\
+            \frac{1}{3} &= \frac{p+1}{3} \text{ or } \frac{2p+1}{3}, \\
+            \frac{1}{4} &= \left(\frac{1}{4}\right)^2, \cdots.
+        \end{align*}
+        However, in implementations, we can not afford this trial-and-error strategy of finding inverses, it is way too time-consuming. What we can do instead is applying a famous result in number theory -- the B\'ezout's lemma.
+        \begin{lemma}[B\'ezout's Lemma]
+            If $\mathrm{gcd}(p,k)=1$, then there exists integers $a$ and $b$ such that $ap+bk=1$.
+        \end{lemma}
+        This lemma can be proven by induction on the Euclidean algorithm.
+
+        Then the procedure to finding $1/k$ for any $k\in\mathrm{GF}(p)$ will be to first find $ak+bp=1$ via the extended Euclidean algorithm, then since $ak\equiv1$ modulo $p$, we have $a=1/k$ in $\mathrm{GF}(p)$.
+
+        Let us now extend the above to the set $\mathcal{F}$ and polynomials. For $f$ the characteristic polynomial of $A$, consider $f$ and $g$ are coprime polynomials in $\mathrm{GF}(p)[x]$. Coprimality of polynomials means that they do not share any factors, and since $f$ is irreducible, any $g$ over $\mathrm{GF}(p)$ must be coprime to $f$. By an extension to the B\'ezout's lemma, there exists polynomials $a$ and $b$ such that $af+bg=1$, the constant 1 polynomial. And since $f$ satisfies $f(A)=0$, we have that
+        \begin{equation*}
+            b(A) \cdot g(A) = \mathbbm{1},
+        \end{equation*}
+        meaning that $g(A)^{-1} = b(A)$.
+    \end{itemize}
+    Having all the operations checked, we can now safely state that the set $\mathcal{F}$ is indeed a field of order $\abs{F} = p^d$.
+\end{proof}
+\begin{example}
+    We have the following field of
+    \begin{equation*}
+        \mathrm{GF}(4) \cong \Bigg\{ \underbrace{\left[\begin{matrix}
+            0 & 0 \\ 0 & 0
+        \end{matrix}\right]}_{0}, \underbrace{\left[\begin{matrix}
+            1 & 0 \\ 0 & 1
+        \end{matrix}\right]}_{1}, \underbrace{\left[\begin{matrix}
+            1 & 1 \\ 1 & 0
+        \end{matrix}\right]}_{A}, \underbrace{\left[\begin{matrix}
+            0 & 1 \\ 1 & 1
+        \end{matrix}\right]}_{B} \Bigg\}.
+    \end{equation*}
+    The set satisfies $1+A=B$, $1+B=A$, $AB=1$, $A^2=B$, and $B^2=A$. In fact, we can see that this field is generated by the degree 2 irreducible polynomial $f(x)=1+x+x^2$ over $\mathrm{GF}(2)$, where $B$ is the companion matrix of $f$.
+\end{example}
+
+In conclusion, we can generate the finite field $\mathrm{GF}(p^n)$ by considering an irreducible polynomial $f$ of degree $n-1$ over $\mathrm{GF}(p)$, then we find the companion matrix $A$ of $f$, lastly, we have the field extension $\mathrm{GF}(p^n) \cong \mathrm{GF}(p)[A]$.
+
+\begin{remark}
+    A more often-seen scheme to introducing finite fields of general orders is by the notion of a quotient. Given an irreducible polynomial $f\in\mathrm{GF}(p)[x]$, the quotient
+    \begin{equation}
+        \mathrm{GF}(p)[x] / (f(x))
+    \end{equation}
+    is a field.
+\end{remark}
+
+There are a few things we have not yet checked, however. To be precise, we have yet check the \textit{existence} of irreducible polynomials of any degree over $\mathrm{GF}(p)$, nor the \textit{uniqueness} of $\mathrm{GF}(p^n)$ when generated using different irreducible polynomials of same degree.
+
+\subsection{Uniqueness of a Finite Field}
+In this subsection, we will discuss the uniqueness of a finite field given its order. We further assume the existence of a finite field. Let $\mathbb{F}$ be a finite field, denote the abelian (commutative) group of
+\begin{equation}
+    \mathbb{F}^\times \defeq \setdef{B\in\mathbb{F}}{B^{-1}\text{ exists}} = \mathbb{F}\backslash \{0\}.
+\end{equation}
+We further denote $\abs{\mathbb{F}}=p^n$, and hence $\abs{\mathbb{F}^\times}=p^n-1$.
+
+\begin{lemma}
+    The set $\mathbb{F}^\times$ is a cyclic group, i.e., there exists an element $B\in\mathbb{F}$ such that
+    \begin{equation*}
+        \mathbb{F}^\times=\{1,B,B^2,\ldots,B^{p^{n}-2}\}.
+    \end{equation*}
+\end{lemma}
+Before we proof this lemma, we must first show that it is indeed non-trivial. The more educated ones may argue that a finite abelian group can always be written as a finite direct product of cyclic groups: $G=\mathbb{Z}_{r_1}\times\mathbb{Z}_{r_2}\times\cdots$. So how can we be so sure that $\mathbb{F}^\times$ is a cyclic group and not a direct product of cyclic groups? A straightforward counter example will be that $\mathbb{F}\times\mathbb{F}$ is not a field! Since $(1,0)\cdot(0,1)=(0,0)$, $(1,0)$ is a zero divisor.
+\begin{proof}
+    For every $k$ in 1 to $p^n-1$, let us denote the set
+    \begin{equation*}
+        T_k = \setdef{B\in\mathbb{F}}{\mathrm{order}(B)=k},
+    \end{equation*}
+    where order of an element is defined by the minimum $k>0$ such that $B^k=1$. Define $S_k$ as the set of solutions to $x^k-1=0$, and $T_k\subseteq S_k$. Since the size of $S_k$ is at most $k$, $\abs{T_k} \le \abs{S_k} \le k$. From this, one can deduce that the number of elements in $T_k$ must be $\abs{T_k} \le \varphi(k)$. The function $\varphi(k)$ is the Euler totient function, denoting the amount of numbers coprime to $k$ from $1$ to $k$. Thus, we have
+    \begin{equation*}
+        \mathbb{F}^\times = \bigsqcup_{k\mid p^n-1}T_k \Rightarrow p^n-1=\abs{\mathbb{F}^\times} = \sum_{k\mid p^n-1} \abs{T_k} \le \sum_{k\mid p^n-1}\varphi(k) = p^n-1.
+    \end{equation*}
+    The last equality is a famous result from number theory. Hence, $\abs{T_k}=\varphi(k)$ for all $k\mid n$. The notation $k\mid n$ reads ``$n$ is divisible by $k$.'' Finally, we know there exists at least an element in $\mathbb{F}^\times$ that has order $p^n-1$, it is a cyclic group.
+\end{proof}
+
+Every $0\neq B\in\mathbb{F}$ satisfying $B^{p^n-1}=1$ is a root to $x^{p^n-1}-1=0$, there can be at most $p^n-1$ of them, and we have just shown that there are indeed $p^n-1$ of them. We often write
+\begin{equation}
+    x^{p^n-1} - 1= \prod_{B\in\mathbb{F},B\neq0}(x-B) \Longleftrightarrow x^{p^n} - x= \prod_{B\in\mathbb{F}}(x-B).
+\end{equation}
+Since all elements of a finite field of order $p^n$ must be the solution to the polynomial $x^{p^n}-x$, all finite fields of order $p^n$ are isomorphic to each other, i.e., their differences can only be a similarity transformation on the matrix elements.
+
+
+\subsection{Existence of a Finite Field}
+Lastly, let us prove the existence of a finite field by showing the existence of an irreducible polynomial of any order $d$ over any prime field $\mathrm{GF}(p)$.
+
+We will show the existence by building from a couple of lemmas.
+\begin{lemma}
+    If $f$ is an irreducible polynomial of degree $d$ over $\mathrm{GF}(p)$, then $f\mid x^{p^d}-x$.
+\end{lemma}
+\begin{proof}
+    Since $f(x)=\prod(x-B)$, where $B\in \mathrm{GF}(p)[x]/(f)\cong\mathrm{GF}(p^d)$ enumerates over all roots of $f$. And we also have $(x-B)\mid x^{p^d}-x$.
+\end{proof}
+\begin{lemma}
+    For all $m$, $x^{p^d}-x\mid x^{p^{md}}-x$.
+\end{lemma}
+\begin{proof}
+    Consider any root $B$ to $x^{p^d}-x=0$, it satisfies $B^{p^d}=B$. Then, $B^{p^{md}} = (B^{p^d})^{p^{(m-1)d}} = B^{p^{(m-1)d}} = \ldots = B$.
+\end{proof}
+
+Combining the above two lemmas, we obtain the following.
+\begin{lemma}
+    If $f$ is an irreducible polynomial of degree $d$, then $f\mid x^{p^{n}}-x$ where $d\mid n$.
+\end{lemma}
+
+This leads to a final step in showing the existence of $\mathrm{GF}(p^n)$:
+\begin{theorem}
+    Let $M(d)$ denote the number of irreducible polynomials over $\mathrm{GF}(p)$ of order $d$, then
+    \begin{equation}
+        \sum_{d\mid n} d \cdot M(d) = p^n
+    \end{equation}
+\end{theorem}
+\begin{proof}
+    Since for any irreducible polynomial $f$ over $\mathrm{GF}(p)$ of degree $d$ with, we have $f\mid x^{p^d}-x$ where $d\mid n$, then
+    \begin{equation}
+        \left.\prod_{f:\text{irred.}, \deg f\mid n} f \;\right\vert\; x^{p^n}-x.
+    \end{equation}
+    Counting the highest degree, we have
+    \begin{equation*}
+        \sum_{d\mid n} d \cdot M(d) \le p^n.
+    \end{equation*}
+    
+    Next, for any $B\in\mathrm{GF}(p^n)$, let $f$ be its \textit{minimum polynomial}, which is the polynomial over $\mathrm{GF}(p)$ with minimum degree such that $B$ is root of it. Consider the field extension $\mathrm{GF}(p)(B)\cong\mathrm{GF}(p)[x]/(f)$. Since $B\in\mathrm{GF}(p^n)$, we have
+    \begin{equation*}
+        \underbrace{[\mathrm{GF}(p)(B):\mathrm{GF}(p)]}_{\deg f} \,\Big|\, [\mathrm{GF}(p^n):\mathrm{GF}(p)(B)].
+    \end{equation*}
+    The notation $[K:F]$ means the dimension of the vector space $K$ over the field $F$. Since each element in $B\in\mathrm{GF}(p^n)$ maps to an irreducible polynomial $f_B$ of degree $d\mid n$, and $f_B$ is mapped to at least $d$ times since it has $d$ distinct roots,
+    \begin{align*}
+        \abs{\mathrm{GF}(p^n)} = \#\setdef{B}{B\in\mathrm{GF}(p^n)} &= \sum_{d\mid n} \#\setdef{B}{\deg f_B=d} \\
+        &\le \sum_{d\mid n} d \#\setdef{f\in\mathrm{GF}(p)[x]}{\exists\,B\in\mathrm{GF}(p^n), f_B = f, \deg f_B = d} \\
+        &\le \sum_{d\mid n} d\cdot M(d).
+    \end{align*}
+    The equality is proven.
+\end{proof}
+
+Finally, since $M(d)\le p^d$, if $M(n)=0$, then
+\begin{equation*}
+    \sum_{d\mid n, d\neq n} d\cdot M(d) \le \sum_{d\mid n, d\neq n} d\cdot p^d \le p^{n/2} \sum_{d=1}^{n/2}d < p^n.
+\end{equation*}
+Hence, we can argue that $M(n)>0$, and that their exists a degree $n$ irreducible polynomial. And hence $\mathrm{GF}(p^n)$ exists.
+
+A more elegant description of $M(n)>0$ is via the M\"obius transform:
+\begin{theorem} \label{thm:w9_mobius}
+    Let $\mu(d)\in\{+1,-1\}$ be the M\"obius function, we have
+    \begin{align}
+        M(n) &= \frac{1}{n} \sum_{d\mid n} \mu(d) \cdot p^{n/d}, \\
+        p^{n} &= \sum_{d\mid n} d \cdot M(d).
+    \end{align}
+\end{theorem}
+
+For another application of the M\"obius transform, one can refer to \aref{app:Greene}.
+
+\begin{remark}
+    From the \autoref{thm:w9_mobius} above, we see that
+    \begin{equation}
+        M(n) \sim \frac{1}{n} p^n \sim \frac{\#\text{ of polynomial up to degree }n}{\ln(\text{numerator})}.
+    \end{equation}
+    This is exactly the form of the \textit{prime number theorem} over function fields!
+
+    The prime number theorem over the field $\mathbb{N}$ states the following: let $\pi(n)$ be the number of primes up to $n$, then
+    \begin{equation}
+        \pi(n) \sim \frac{N}{\ln N}.
+    \end{equation}
+    In fact, the prime number theorem holds for numbers, extension fields, function fields, and even permutations!
+\end{remark}
+
+\begin{remark}
+    For all possible $p$ and $d$, we have shown that there exists an irreducible polynomial, however, which one is the best? I.e., how can we fix a representation that is ``good'' enough?
+
+    The \textit{Conway polynomials} are the first such representation, standardizing the choosing of the irreducible polynomials via lexicographic ordering.
+\end{remark}
+
+
+
+\section{Reed--Solomon Codes over $\mathrm{GF}(p^n)$}
+Let us upgrade from the simpler Reed--Solomon code introduced back in \autoref{sec:w7_RM_RS}.
+
+\begin{definition}
+    Given a prime number $p$ and an integer $n$. Choose an integer $k$ and another integer $N \le p^n$, we can select distinct \textit{evaluation points} $a_1$, $a_2$, $\ldots$, $a_N\in\mathrm{GF}(p^n)$. Then, the Reed--Solomon code is defined as
+    \begin{equation}
+        \mathrm{RS}(a_{1:N},k) \defeq \setdef{\left(f(a_1),f(a_2),\ldots,f(a_N)\right)}{f\in\mathrm{GF}(p^n)[x]^{<k}}
+    \end{equation}
+    One often writes $q$ in place of $p^n$.
+\end{definition}
+
+\begin{remark}
+    The Reed--Solomon code is a really widely used code, appearing in our daily lives. For example the case where $p=2$ and $n=8$ is used in AES and QR codes. However, the polynomials used in the representation of AES are not the Conway polynomials, hence AES is often criticized for this reduce in efficiency.
+\end{remark}
+
+\begin{theorem}
+    $\mathrm{RS}(a_{1:N},k)$ is an $[N,k,N-k+1]$-code over $\mathrm{GF}(q)$.
+\end{theorem}
+The proof is same as that of \autoref{thm:w7_RS_min_dist} by using an argument on the degrees of freedom.
+\begin{proof}
+    An equivalent statement is that for all polynomials $f,g\in\mathrm{GF}(q)[x]^{<k}$, $d=n-k+1$ of the evaluation points, say $a_{i_1}$ to $a_{i_d}$, satisfy
+    \begin{equation*}
+        f(a_{i_j})\neq g(a_{i_j})\;\;\;\;\;\forall\,j=1\sim d.
+    \end{equation*}
+    If the minimum distance of the Reed-Solomon code is less than $d$, say it is $N-k$, then any two polynomials should differ at $n-k$ points, and coincide at $k$ points. Without loss of generality, let $f$ and $g$ coincide at $a_1, a_2,\ldots,a_k$, then
+    \begin{equation*}
+        \underbrace{(x-a_1)(x-a_2)\cdots(x-a_k)}_{\text{degree }k}\mid \underbrace{f-g}_{\text{degree }<k}.
+    \end{equation*}
+    The only possibility is if $f-g=0$, which is a contradiction. Hence it is proven.
+\end{proof}
+\begin{lemma}[Singleton Bound]
+    All $[N,k]$ linear codes have a minimum distance $\le N-k+1$.
+\end{lemma}
+Thus, we can see that Reed--Solomon codes are optimal in terms of their minimum distances by using the Singleton bound!
+
+Next, we can also define the general Reed--Solomon code over $\mathrm{GF}(q)$ as
+\begin{definition}
+    Continue on the setting of a Reed--Solomon code. Select $c_1$, $c_2$, $\ldots$, $c_N\in\mathrm{GF}(q)$ that need not be distinct. The generalized Reed--Solomon code is defined as
+    \begin{equation}
+        \mathrm{GRS}(c_{1:N},a_{1:N},k) \defeq \setdef{\left(c_1f(a_1),c_2f(a_2),\ldots,c_Nf(a_N)\right)}{f\in\mathrm{GF}(q)[x]^{<k}}.
+    \end{equation}
+\end{definition}
+When using the generalized Reed--Solomon code, one simply divides the received codeword by $c_i$'s to obtain the Reed--Solomon code. The only interesting thing and reason that we introduce it is that the dual of a Reed--Solomon code is $\mathrm{RS}^\perp = \mathrm{GRS}$.
+
+\begin{example}
+    A Reed--Solomon code is called a \textit{full Reed--Solomon code} when the length $N=q$. 
+    \begin{theorem}[Dual of a Full Reed--Solomon Code]
+        Pick any dimension $k$ and form the full Reed--Solomon code $\mathcal{C}$. Them, $\mathcal{C}^\perp$ is also a full Reed--Solomon code of dimension $q-k$.
+    \end{theorem}
+    \begin{proof}
+        Consider any polynomial $f\in\mathrm{GF}(q)[x]^{<k}$ and $g\in\mathrm{GF}(q)[x]^{<q-k}$. Then
+        \begin{equation*}
+            \left(f(a_1),\ldots,f(a_q)\right) \cdot \left(g(a_1),\ldots,g(a_q)\right) = \sum_{i=1}^q (\underbrace{f\cdot g}_{h})(a_i).
+        \end{equation*}
+        For any $h$ of degree less than $q$, we have by symmetry
+        \begin{equation*}
+            \sum_{i=1}^q h(a_i) = 0.
+        \end{equation*}
+        Hence we see that $f$ and $g$ are always orthogonal, and the theorem is proven.
+    \end{proof}
+    The dual to a full Reed--Solomon code is really simple.
+\end{example}
+
+\begin{example}
+    For non-full Reed--Solomon codes, we can also have a simple description of its dual by viewing them as punctured full Reed--Solomon codes. This proof is different from the one given in \autoref{thm:w7_dual_GRS}. By the following diagram:
+    \begin{center}
+    \begin{tikzcd}
+	{\mathcal{C}} && {\mathrm{Pun}_N(\mathcal{C})} \\
+	{\mathcal{C}^\perp} && {\mathrm{Sho}_N(\mathcal{C}^\perp)}
+	\arrow["{\mathrm{Pun}_N}", from=1-1, to=1-3]
+	\arrow["\perp"', from=1-1, to=2-1]
+	\arrow["\perp", from=1-3, to=2-3]
+	\arrow["{\mathrm{Sho}_N}", from=2-1, to=2-3]
+    \end{tikzcd}
+    \end{center}
+    We have, for the code
+    \begin{equation*}
+        \mathrm{Pun}_N(\mathcal{C}) = \setdef{\left(f(a_1),\ldots,f(a_{N-1})\right)}{f\in\mathrm{GF}(q)[x]^{<k}},
+    \end{equation*}
+    its dual code being
+    \begin{align*}
+        \mathrm{Sho}_N(\mathcal{C}^\perp) &= \mathrm{Sho}_N \setdef{\left(g(a_1),\ldots,g(a_{N-1}),g(a_N)\right)}{g\in\mathrm{GF}(q)[x]^{<N-k}} \\
+        &= \setdef{\left(g(a_1),\ldots,g(a_{N-1})\right)}{g\in\mathrm{GF}(q)[x]^{<N-k}, g(a_N)=0} \\
+        &= \setdef{\left(g(a_1),\ldots,g(a_{N-1})\right)}{g(x)=h(x)\cdot(x-a_N), h\in\mathrm{GF}(q)[x]^{< N-k-1}} \\
+        &= \setdef{\left((a_1-a_N)h(a_1),\ldots,(a_{N-1}-a_N)h(a_{N-1})\right)}{h\in\mathrm{GF}(q)[x]^{< N-k-1}}.
+    \end{align*}
+    By continuing puncturing the code, we will have more Vandermonde-like terms in the front, and finally obtaining the dual code to a general Reed--Solomon code as in \autoref{thm:w7_dual_GRS}.
+\end{example}

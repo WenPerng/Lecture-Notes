@@ -1,0 +1,370 @@
+In this section we trace back to the more classical coding theory of linear codes. Special emphasis are put on the Reed--Solomon code. We will first give some more basic results on the prime fields of $\mathrm{GF}(p)$, these includes the not-so-trivial weight enumerator polynomial and the MacWilliams' identity. Then, after diving into the vast theory of abstract algebra and having the knowledge of a general field $\mathrm{GF}(p^n)$, we will give a general description to Reed--Solomon code and its properties.
+
+\section{Binary Linear Code} \label{sec:w6_algebra}
+\lecture{25 Mar.}
+For half of the lecture, we have talked about polar codes and its non-trivial properties. Next, we will dive into the theory of LDPC codes. However, before that, we should first review the results of the classical linear codes.
+
+\begin{definition}[Binary Linear Code]
+    A (binary) linear code $\mathcal{C}\in\mathbb{F}^n_2$ is a subspace of the finite field $\mathbb{F}^n_2$ (also written as the Galois field $\mathrm{GF}(2)^n$), where
+    \begin{enumerate}
+        \item $n$ is the block length, and
+        \item $k = \dim\mathcal{C}$ is the dimension of the code.
+    \end{enumerate}
+    We also say that $\mathcal{C}$ is an $[n,k]$-code.
+\end{definition}
+Besides the notation $[n,k]$-code, one might also see an $[n,k,d]$-code, where the variable $d$ is defined as the minimum Hamming distance between two codewords
+\begin{equation}
+    d \defeq \min_{x,y\in\mathcal{C}} d_\mathrm{H}(x,y).
+\end{equation}
+But note that since we are working with linear code, $\mathcal{C}$ is a subspace and $x-y\in\mathcal{C}$, so we also have that, in this case,
+\begin{equation}
+    d = \min_{x\in\mathcal{C}} d_\mathrm{H}(x,0) = \min_{x\in\mathcal{C}}\abs{x},
+\end{equation}
+where $\abs{x}$ again denotes the Hamming weight of $x$. We call the Hamming distance of a codeword from 0 the \textit{Hamming weight} of that codeword.
+
+And this is the whole point of using linear code! By the properties inherited from its vector space definition, many of the equations can be simplified. But sometimes it simplifies too much, making the result too trivial to be useful.
+
+\begin{remark}
+    In comparison to linear code, we will see how polar code can be used to construct ``non-linear'' codes that can be better than linear code under certain circumstances later.
+\end{remark}
+
+\begin{definition}[Corrupted Codeword]
+    For a codeword $x\in\mathcal{C}$, the output of a channel $W$ given input $x$ is called a \textit{corrupted (code)word}.    
+\end{definition}
+
+\begin{definition}[Weight Enumerator Polynomial]
+    The weight enumerator of a linear code $\mathcal{C}$ is defined as the generating function of the form
+    \begin{equation}
+        A_\mathcal{C}(z) \defeq \sum_{w\in\mathcal{C}} z^{\abs{w}} = \sum_{i=0}^n A_i z^i,
+    \end{equation}
+    where $z$ is an arbitrary abstract variable, $\abs{\cdot}$ denotes the weight of a codeword, and $A_i$ is the number of codewords in $\mathcal{C}$ that has weight $i$. The weight enumerator is a polynomial in $z$. The sequence $(A_0,\ldots,A_n)$ is called the weight distribution of the code.
+\end{definition}
+
+\begin{definition}[Homogeneous Weight Enumerator]
+    We can homogenize the weight enumerator of a linear code into
+    \begin{equation}
+        A_\mathcal{C}(x,y) \defeq \sum_{w\in\mathcal{C}} x^{\abs{w}} y^{n-\abs{w}} = \sum_{i=0}^n A_i x^i y^{n-i}.
+    \end{equation}
+    This is a homogeneous polynomial in the abstract variables $x$ and $y$.
+\end{definition}
+It is obvious to see that for $d$ being the minimum weight of a linear code $\mathcal{C}$, we have, as $z\rightarrow 0$,
+\begin{equation*}
+    A_\mathcal{C}(z)\in O(z^d).
+\end{equation*}
+
+Further, the two forms of the weight enumerator can be interchanged,
+\begin{align}
+    &A_\mathcal{C}(x,y) = y^n A_\mathcal{C}(x/y), &A_\mathcal{C}(z) = A_\mathcal{C}(z,1).
+\end{align}
+I.e., the two forms contain the same amount of information.
+
+\begin{remark}
+    When $\mathcal{C}$ is used over $\mathrm{BSC}(p)$, there is a probability of $p^{\abs{w}}\bar{p}^{n-\abs{w}}$ that $0\in\mathcal{C}$ is flipped into $w$.
+    
+    For decoding, flipping $d/2$ bits is confusing enough, and will result in a block error probability $\le O(p^{d/2})$ as $p\rightarrow 0$.
+
+    Since the weight enumerator polynomial carries information about the error, it is important.
+\end{remark}
+
+Since $\mathcal{C}$ is a vector space, we can define a kind of scalar product on it:
+\begin{definition}[Pairing]
+    To put it in brief, a pairing is a bilinear map that satifies:
+    \begin{enumerate}
+        \item $\langle x,y+z\rangle = \langle x,y\rangle + \langle x,z\rangle$,
+        \item $a\langle x,y\rangle = \langle ax,y\rangle = \langle x,ay\rangle$,
+    \end{enumerate}
+    where $a$, $x$, $y$ reside in a suitable ring / module. As for our case where $a\in\mathbb{F}_2$ and $x,y\in\mathbb{F}_2^{n\times1}$,
+    \begin{equation}
+        \langle x,y\rangle = x_1y_1 + \cdots + x_ny_n.
+    \end{equation}
+\end{definition}
+Note that a pairing is NOT an inner product.
+
+Given a pairing, we can define the \textit{dual} of a code.
+\begin{definition}[Dual Code]
+    The dual code to $\mathcal{C}$ is defined as
+    \begin{equation}
+        \mathcal{C}^\perp \defeq \setdef{y\in\mathbb{F}_2^{n\times1}}{y\perp \mathcal{C}}.
+    \end{equation}
+    The phrase ``$y\perp\mathcal{C}$'' is equivalent to $y\perp x$ for all $x\in\mathcal{C}$, or that $\langle y,x\rangle = 0$ for all $x\in\mathcal{C}$.
+\end{definition}
+
+\begin{theorem}
+    For any code $\mathcal{C}$,
+    \begin{equation}
+        (\mathcal{C}^\perp)^\perp = \mathcal{C}.
+    \end{equation}
+\end{theorem}
+
+Let us now introduce a few more terms that proves to be really useful later on.
+
+\begin{definition}[Generation Matrix]
+    A generation matrix of a code $\mathcal{C}$ is a matrix $G\in\mathbb{F}_2^{k'\times n}$ whose row space is $\mathcal{C}$. Given a message $u$, the corresponding code word would then be
+    \begin{equation}
+        x = uG.
+    \end{equation}
+\end{definition}
+
+The generation matrix can be full rank or not. Generally, it is not, and $k'\ge k$. Some standard forms are of most use:
+\begin{enumerate}
+    \item row reduced echelon form (RREF):
+    \begin{equation*}
+        G = \left[\begin{matrix}
+            1 & * & * & * & * & * \\
+            ~ & ~ & 1 & * & * & * \\
+            ~ & ~ & ~ & 1 & * & *
+        \end{matrix}\right].
+    \end{equation*}
+    \item systematic form:
+    \begin{equation*}
+        G = \underbrace{\left[\begin{matrix}
+            1 & ~ & ~ \\
+            ~ & 1 & ~ \\
+            ~ & ~ & 1 
+        \end{matrix}\right.}_{\text{systematic part}}\underbrace{\left.\begin{matrix}
+            * & * & * \\
+            * & * & * \\
+            * & * & * 
+        \end{matrix}\right]}_{\text{check sums}}.
+    \end{equation*}
+    In early days of coding theory, it is often designed to have systematic part storing the information that needs to be protected, and the check sum bits are there to protect.
+\end{enumerate}
+\begin{definition}[Parity-Check Matrix]
+    The parity-check matrix of a code $\mathcal{C}$ is denoted by $H\in\mathbb{F}_2^{ h'\times n}$ if $H$ is a generator matrix of the dual code $\mathcal{C}^\perp$. Or equivalently, the left null space of $H^\transpose$ is $\mathcal{C}$:
+    \begin{equation}
+        \mathcal{C} = \setdef{x\in\mathbb{F}_2^{1\times n}}{xH^\transpose=0}.
+    \end{equation}
+\end{definition}
+Again, $H$ need not be full rank ($h'\ge n-k$), but it will be nice if it is. Moreover, the generator matrix of $\mathcal{C}$ is a parity-check matrix of $\mathcal{C}^\perp$; a parity-check matrix of $\mathcal{C}$ is a generator matrix of $\mathcal{C}^\perp$.
+
+\begin{definition}[Low Density]
+    A matrix with a low number of 1's in its rows is called \textit{low density}. Especially, if the parity matrix $H$ of a code is of low density, this is a low-density parity-check (LDPC) code. A typical LDPC code has only three 1's in each row. 
+\end{definition}
+\begin{example}
+    A $(3,6)$ LDPC code has weight 6 columns and weight 3 rows.
+\end{example}
+\begin{remark}
+    The reason why the number three is chosen as the density of a LDPC code is as demonstrated below:
+    \begin{enumerate}
+        \item If $\#1\text{'s in }H = 0$, then we have that $H$ is the zero matrix, making the parity-check matrix not useful at all.
+        \item If $\#1\text{'s in }H = 1$, then the rows of $H$ must be of the form $y_i = \delta_{ij}$ where $j$ is fixed. Then when used as parity check, this only tells us that $\langle y,x\rangle=0 \Rightarrow x_j=0$, which in fact forces there to be zeros in the code.
+        \item If $\#1\text{'s in }H = 2$, then we have that, for example, $y_2=y_5=1$. Hence, $\langle y,x\rangle=0\Rightarrow x_2=x_5$, meaning that $x_5$ is simply a copy of $x_2$. Not a particularly good parity check method either.
+        \item If $\#1\text{'s in }H = 3$, then we have that, for exampling a row satisfying $y_2=y_3=y_5=1$. Hence, we have $\langle y,x\rangle=0\Rightarrow x_2+x_3+x_5=0$. This is a non-trivial equation, and may be really useful in checking for errors and fixing them.
+    \end{enumerate}
+\end{remark}
+
+\begin{definition}[Syndrome]
+    For a parity-check matrix $H\in\mathbb{F}_2^{(n-k)\times n}$ which is full rank, we can define the map $\psi:\mathbb{F}_2^{1\times n}\rightarrow\mathbb{F}_2^{1\times n-k}$
+    \begin{equation}
+        \psi(v) = vH^\transpose.
+    \end{equation}
+    The value $vH^\transpose$ is called the \textit{syndrome} of the word $v$. If $vH^\transpose\neq0$, then $v\notin\mathcal{C}$, meaning there is something wrong with $v$.
+\end{definition}
+
+\begin{theorem} 
+    An equivalence of the rank-nullity theorem states that
+    \begin{equation}
+        \dim\mathcal{C} + \dim\mathcal{C}^\perp = n. \label{eq:rank-nullity}
+    \end{equation}
+\end{theorem}
+\begin{proof}
+    Consider the map $\psi(v)=vH^\transpose$ for $v\in\mathbb{F}_2^{1\times n}$ and $H$ the full rank parity check matrix of the code $\mathcal{C}$. We then have that
+    \begin{equation*}
+        \ker\psi = \setdef{x\in\mathbb{F}_2^{1\times n}}{\langle x,y\rangle=0 \text{ for all row vectors }y \text{ of }H} = \mathcal{C}.
+    \end{equation*}
+    Since the $H$ is full rank, we also have that $\mathrm{rank}~\psi=n-k$. Hence, by the rank-nullity theorem:
+    \begin{equation*}
+        n = \mathrm{rank}~\psi + \mathrm{null}~\psi = (n-k) + k.
+    \end{equation*}
+\end{proof}
+
+\begin{remark} \label{rmk:w6_RM_self_dual}
+    It should be noted that although $\mathcal{C}\cup \mathcal{C}^\perp \supseteq \{0\}$, the equality sign does not necessarily holds.
+
+    A prime example is the so called \textit{self-dual codes}. An example is the following $[4,2]$-code:
+    \begin{equation*}
+        G = H = \left[\begin{matrix}
+            1 & 0 & 1 & 0 \\ 1 & 1 & 1 & 1
+        \end{matrix}\right].
+    \end{equation*}
+    Another prime example of a self-dual code is some special Reed--Muller codes, which were introduced back in \autoref{sec:RMcode}. The proof is given in \autoref{sec:w7_RM_RS}.
+\end{remark}
+
+\section{Punctured and Shortened Codes}
+A powerful theorem relating the weight enumerator function of a code and its dual is the MacWilliams' identity. The following two operations are introduced so as to prove the MacWilliams' identity stated later, they are operations that reduce a code into smaller subcodes.
+
+\begin{definition}[Punturing]
+    The puncturing of an $[n,k]$-code $\mathcal{C}$ at position $i$ is defined as the following code of block length $n-1$:
+    \begin{equation}
+        \mathrm{Pun}_i(\mathcal{C}) \defeq \setdef{x_1\ldots x_{i-1}x_{i+1}\ldots x_n}{x=x_1\ldots x_n\in\mathcal{C}}.
+    \end{equation}
+\end{definition}
+\begin{definition}[Shortening]
+    The shortening of an $[n,k]$-code $\mathcal{C}$ at position $i$ is defined as the following code of block length $n-1$:
+    \begin{equation}
+        \mathrm{Sho}_i(\mathcal{C}) \defeq \setdef{x_1\ldots x_{i-1}x_{i+1}\ldots x_n}{x=x_1\ldots x_n\in\mathcal{C} \text{ and } x_i=0}.
+    \end{equation}
+\end{definition}
+
+It is obvious to see that $\mathrm{Sho}_i(\mathcal{C})$ is a subspace of $\mathrm{Pun}_i(\mathcal{C})$. The fact that the two sets defined above are a vector space can be readily checked by the readers.
+
+\begin{theorem}[Duality between Puncturing and Shortening]
+    Given a linear code $\mathcal{C}$, the following two dualities hold:
+    \begin{align}
+        \mathrm{Pun}_i(\mathcal{C}^\perp) &= \mathrm{Sho}_i(\mathcal{C})^\perp, \\
+        \mathrm{Sho}_i(\mathcal{C}^\perp) &= \mathrm{Pun}_i(\mathcal{C})^\perp. \label{eq:sho_pun_dual}
+    \end{align}
+\end{theorem}
+Since the dual code of a dual code is the original code, we will only be proving \autoref{eq:sho_pun_dual}.
+\begin{proof}
+    Consider any $x'\in\mathrm{Pun}_i(\mathcal{C})$ and $y'\in\mathrm{Sho}_i(\mathcal{C}^\perp)$. Also define $x\in\mathcal{C}$ and $y\in\mathcal{C}^\perp$ to be the code words that maps to $x$ and $y$ when their $i$th letter is removed, respectively. Then we have
+    \begin{equation*}
+        \langle x',y'\rangle = \langle x,y\rangle - x'_iy'_i = -x'_i\cdot 0 = 0.
+    \end{equation*}
+    Hence $\mathrm{Pun}_i(\mathcal{C})^\perp \supseteq \mathrm{Sho}_i(\mathcal{C}^\perp)$.
+
+    Furthermore, let us count the dimension:
+    % consider the function $\varphi:\mathcal{C}\rightarrow\mathbb{F}_2$, $x\mapsto x_i$. Then we have $\ker\varphi = \setdef{x\in\mathcal{C}}{x_i=0}$. Since $\dim\ker\varphi = \dim\mathrm{Sho}_i(\mathcal{C})$,
+    % \begin{equation}
+    %     \dim\mathrm{Sho}_i(\mathcal{C}) = \begin{cases}
+    %         k &\text{if $x_i=0$ for all $x\in\mathcal{C}$,}\\
+    %         k-1 &\text{if $x_i=0$ for some $x\in\mathcal{C}$.}\\
+    %     \end{cases}
+    % \end{equation}
+    % Henceforth, we have that $\dim\mathrm{Sho}_i(\mathcal{C}^\perp) = n-k$ or $n-k-1$ depending on whether $y_i=0$ for all $y\in\mathcal{C}^\perp$, which is exactly the same as $\dim\mathrm{Pun}_i(\mathcal{C})^\perp = n - \dim\mathrm{Pun}_i(\mathcal{C})$.
+    \begin{enumerate}[label=(A\arabic*)]
+        \item \label{w6:A-1}
+        If $x_i=0$ for all $x\in\mathcal{C}$, then $(0,\ldots,0,1)\in\mathcal{C}^\perp$, and
+        \begin{equation*}
+            \mathrm{Pun}_i(\mathcal{C}) = \mathrm{Sho}_i(\mathcal{C}) = \mathcal{C} \Rightarrow \dim\mathrm{Pun}_i(\mathcal{C}) = \dim\mathrm{Sho}_i(\mathcal{C}) = \dim\mathcal{C}.
+        \end{equation*}
+        \item \label{w6:A-2}
+        If $(0,\ldots,0,1,0,\ldots,0)\in\mathcal{C}$ (1 at $i$th position), then $x^\perp_i=0$ for all $x^\perp\in\mathcal{C}^\perp$, and
+        \begin{equation*}
+            \mathrm{Pun}_i(\mathcal{C}) = \mathrm{Sho}_i(\mathcal{C})\Rightarrow 
+            \abs{\mathrm{Pun}_i(\mathcal{C})} = \abs{\mathrm{Sho}_i(\mathcal{C})} = \frac{1}{2}\abs{\mathcal{C}}.
+        \end{equation*}
+        \item \label{w6:A-3}
+        If some $x_i=1$ but $(0,\ldots,0,1,0,\ldots,0)\not\in\mathcal{C}$, then some $x^\perp_i=1$ but $(0,\ldots,0,1,0,\ldots,0)\not\in\mathcal{C}^\perp$, and
+        \begin{equation*}
+            \abs{\mathrm{Sho}_i(\mathcal{C})} = \frac{1}{2}\abs{\mathcal{C}}, \abs{\mathrm{Pun}_i(\mathcal{C})} = \abs{\mathcal{C}}.
+        \end{equation*}
+    \end{enumerate}
+    The notation $\abs{\mathcal{C}}$ denotes the number of codewords in the code $\mathcal{C}$. For all three cases above, we have that
+    \begin{equation*}
+        \dim\mathrm{Pun}_i(\mathcal{C}) + \dim\mathrm{Sho}_i(\mathcal{C}^\perp) = n-1.
+    \end{equation*}    
+    Since the dimension of $\mathrm{Pun}_i(\mathcal{C})^\perp$ and $\mathrm{Sho}_i(\mathcal{C}^\perp)$ are the same, as well as the former includes the latter, they are the same subspace.
+\end{proof}
+
+The technique of dividing the problem on a length $n$ code into its puncturing and shortening of length $n-1$ is really useful. Combined with the duality between puncturing and shortening, we here present a very non-trivial result on the relationship between the weight enumerator of a code and its dual.
+
+\begin{theorem}[MacWilliams' Identity] \label{thm:w6_McWilliams}
+    Denote the number of codewords in a code $\mathcal{C}$ as $\abs{\mathcal{C}}$, then the following identity holds:
+    \begin{equation}
+        A_{\mathcal{C}^\perp}(x,y) = \frac{1}{\abs{\mathcal{C}}} A_\mathcal{C}(y-x,y+x).
+    \end{equation}
+\end{theorem}
+\begin{proof}
+    Let us abbreviate $A_{\mathrm{Pun}_i(\mathcal{C})}$ by $A_{\mathrm{P}_i(\mathcal{C})}$ and $A_{\mathrm{Sho}_i}$ by $A_{\mathrm{S}_i(\mathcal{C})}$. Continue on with \ref{w6:A-1} to \ref{w6:A-3}, for a $w=(w_1,w_2,\ldots,w_n)\in\mathcal{C}$,
+    \begin{enumerate}[label=(\Alph*)]
+        \setcounter{enumi}{1}
+        \item 
+        If $w_n=0$, $w$ contributes 
+        \begin{enumerate}[label=(B\arabic*)]
+            \item \label{w6:B-1}
+            $x^{\abs{w}}y^{n-\abs{w}}$ to $A_\mathcal{C}$,
+            \item \label{w6:B-2}
+            $x^{\abs{w}}y^{n-1-\abs{w}}$ to $A_{\mathrm{P}_n(\mathcal{C})}$, and 
+            \item \label{w6:B-3}
+            $x^{\abs{w}}y^{n-1-\abs{w}}$ to $A_{\mathrm{S}_n(\mathcal{C})}$.
+        \end{enumerate}
+        \item If $w_n=1$,
+        \begin{enumerate}[label=(C\arabic*)]
+            \item \label{w6:C-1}
+            $w$ contributes $x^{\abs{w}}y^{n-\abs{w}}$ to $A_\mathcal{C}$, and
+            \item \label{w6:C-2}
+            further if \ref{w6:A-3}, $w$ contributes $x^{\abs{w}-1}y^{n-1-\abs{w}-1}=x^{\abs{w}-1}y^{n-\abs{w}}$ to $A_{\mathrm{P}_n(\mathcal{C})}$.
+        \end{enumerate}
+    \end{enumerate}
+    For the cases below, we can represent $A_\mathcal{C}$ simply using $A_{\mathrm{P}_n(\mathcal{C})}$ and $A_{\mathrm{S}_n(\mathcal{C})}$:
+    \begin{itemize}
+        \item If \ref{w6:A-1}, then
+        \begin{align*}
+            A_\mathcal{C} = \bigg(\overbrace{\sum_{w_n=1}}^{\text{\ref{w6:C-1}}}+\overbrace{\sum_{w_n=0}}^{\text{\ref{w6:B-1}}}\bigg) x^{\abs{w}}y^{n-\abs{w}} &= 0 + y\cdot \text{\ref{w6:B-2}} = y A_{\mathrm{P}_n(\mathcal{C})} \\
+            &= 0 + y\cdot \text{\ref{w6:B-3}} = y A_{\mathrm{S}_n(\mathcal{C})}.
+        \end{align*}
+        \item If \ref{w6:A-2}, then since $\mathrm{Pun}_n(\mathcal{C}) = \mathrm{Sho}_n(\mathcal{C})$ and $\mathcal{C} = \left(\mathrm{Pun}_n(\mathcal{C}),1\right) \cup \left(\mathrm{Pun}_n(\mathcal{C}),0\right)$,
+        \begin{align*}
+            A_\mathcal{C} = \text{\ref{w6:C-1}} + \text{\ref{w6:B-1}} &= (x+y)\cdot \text{\ref{w6:B-2}} = (x+y) A_{\mathrm{P}_n(\mathcal{C})}\\
+            &= (x+y)\cdot \text{\ref{w6:B-2}} = (x+y) A_{\mathrm{S}_n(\mathcal{C})}.
+        \end{align*}
+        \item If \ref{w6:A-3}, then
+        \begin{align*}
+            A_\mathcal{C} = \text{\ref{w6:C-1}} + \text{\ref{w6:B-1}} &= x\cdot\text{\ref{w6:C-2}} + y\cdot\text{\ref{w6:B-3}} = x A_{\mathrm{P}_n(\mathcal{C}),w_n=1} + y A_{\mathrm{S}_n(\mathcal{C})}\\
+            &= x \left(A_{\mathrm{P}_n(\mathcal{C})} - A_{\mathrm{S}_n(\mathcal{C})}\right) + y A_{\mathrm{S}_n(\mathcal{C})} = (y-x) A_{\mathrm{S}_n(\mathcal{C})} + x A_{\mathrm{P}_n(\mathcal{C})}.
+        \end{align*}
+    \end{itemize}
+    Now, let us combine everything. In the base case where the code has length $1$, $\mathcal{C}=\{0\}$ or $\{0,1\}$, with $\mathcal{C}^\perp=\{0,1\}$ or $\{0\}$, respectively. Without loss of generality, let us consider $\mathcal{C}=\{0\}$ and $\mathcal{C}^\perp=\{0,1\}$, with $A_\mathcal{C}(x,y)=y$, $\abs{\mathcal{C}}=1$ and $A_{\mathcal{C}^\perp}(x,y)=x+y$. The statement obviously holds. Now let us suppose that codes up to length $n-1$ satisfy the statement. For a code $\mathcal{C}$ of length $n$, three cases can be considered:
+    \begin{itemize}
+        \item If \ref{w6:A-1},
+        \begin{align*}
+            A_{\mathcal{C}^\perp}(x,y) &= (x+y) A_{\mathrm{P}_n(\mathcal{C}^\perp)}(x,y) = (x+y) A_{\mathrm{S}_n(\mathcal{C})^\perp}(x,y) \\
+            &\stackrel{(\text{i})}{=} \frac{x+y}{\abs{\mathrm{S}_n(\mathcal{C})}}A_{\mathrm{S}_n(\mathcal{C})}(y-x,y+x) = \frac{1}{\abs{\mathcal{C}}} A_{\mathcal{C}}(y-x,y+x).
+        \end{align*}
+        \item If \ref{w6:A-2},
+        \begin{align*}
+            A_{\mathcal{C}^\perp}(x,y) &= y A_{\mathrm{P}_n(\mathcal{C}^\perp)}(x,y) = y A_{\mathrm{S}_n(\mathcal{C})^\perp}(x,y) \\
+            &\stackrel{(\text{i})}{=} \frac{y}{\abs{\mathrm{S}_n(\mathcal{C})}} A_{\mathrm{S}_n(\mathcal{C})}(y-x,y+x) = \frac{(y-x)+(y+x)}{2\abs{\mathrm{S}_n(\mathcal{C})}} A_{\mathrm{S}_n(\mathcal{C})}(y-x,y+x) \\
+            &= \frac{1}{\abs{\mathcal{C}}} A_{\mathcal{C}}(y-x,y+x).
+        \end{align*}
+        \item If \ref{w6:A-3},
+        \begin{align*}
+            A_{\mathcal{C}^\perp}(x,y) &= (y-x) A_{\mathrm{S}_n(\mathcal{C}^\perp)}(x,y) + x A_{\mathrm{P}_n(\mathcal{C}^\perp)}(x,y) = (y-x) A_{\mathrm{P}_n(\mathcal{C})^\perp}(x,y) + x A_{\mathrm{S}_n(\mathcal{C})^\perp}(x,y) \\
+            &\stackrel{(\text{i})}{=} \frac{y-x}{\abs{\mathrm{P}_n(\mathcal{C})}} A_{\mathrm{P}_n(\mathcal{C})}(y-x,y+x) + \frac{x}{\abs{\mathrm{S}_n(\mathcal{C})}} A_{\mathrm{S}_n(\mathcal{C})}(y-x,y+x) \\
+            &= \frac{1}{\abs{\mathcal{C}}} \left((y-x)A_{\mathrm{P}_n(\mathcal{C})}(y-x,y+x) + ((y+x)-(y-x))A_{\mathrm{S}_n(\mathcal{C})}(y-x,y+x)\right) \\
+            &= \frac{1}{\abs{\mathcal{C}}} A_\mathcal{C}(y-x,y+x).
+        \end{align*}
+    \end{itemize}
+    The $\stackrel{(\text{i})}{=}$ implies by induction. Henceforth, the statement holds for all cases, and the theorem is proven.
+\end{proof}
+
+We see from the above proof a repeating scheme for proving these statements. First we reduce a code into a combination of the subcodes of puncturing and shortening, and three cases should be considered. Then by induction, the statement can be proven. We will see this technique being used yet again for the upcoming two lemmas.
+
+
+
+% \begin{theorem}[MacWilliams' Identity]
+%     Denote the number of codewords in a code $\mathcal{C}$ as $\abs{\mathcal{C}}$, then the following identity holds:
+%     \begin{equation}
+%         A_{\mathcal{C}^\perp}(x,y) = \frac{1}{\abs{\mathcal{C}}} A_\mathcal{C}(x+y,x-y).
+%     \end{equation}
+% \end{theorem}
+% \begin{proof}
+%     \hl{
+%     Consider a codeword $w\in\mathcal{C}$, it contributes a term $x^{\abs{w}}y^{n-\abs{w}}$ in the sum of $A_\mathcal{C}(x,y)$. Similarly,
+%     \begin{itemize}
+%         \item if $w_n=0$, then $w$ contributes $x^{\abs{w}}y^{(n-1)-\abs{w}}$ to both $A_{\mathrm{Sho}_n(\mathcal{C})}(x,y)$ and $A_{\mathrm{Pun}_n(\mathcal{C})}(x,y)$;
+%         \item if $w_n=1$, then $w$ contributes $x^{\abs{w}-1}y^{n-\abs{w}}$ to only $A_{\mathrm{Pun}_n(\mathcal{C})}(x,y)$.
+%     \end{itemize}
+%     Henceforth,
+%     \begin{align*}
+%         A_\mathcal{C}(x,y) &= A_{\mathcal{C},w_n=0}(x,y) + A_{\mathcal{C},w_n=1}(x,y) \\
+%         &= yA_{\mathrm{Sho}_n(\mathcal{C})}(x,y) + x A_{\mathrm{Pun}_n(\mathcal{C}),w_n=1}(x,y) \\
+%         &= yA_{\mathrm{Sho}_n(\mathcal{C})}(x,y) + x \left(A_{\mathrm{Pun}_n(\mathcal{C})}(x,y) - A_{\mathrm{Sho}_n(\mathcal{C})}(x,y)\right) \\
+%         \Rightarrow A_\mathcal{C}(x,y) &= (y-x) A_{\mathrm{Sho}_n(\mathcal{C})}(x,y) + x A_{\mathrm{Pun}_n(\mathcal{C})}(x,y) \\
+%         \Rightarrow A_{\mathcal{C}^\perp}(x,y) &= (y-x) A_{\mathrm{Pun}_n(\mathcal{C})^\perp}(x,y) + x A_{\mathrm{Sho}_n(\mathcal{C})^\perp}(x,y).
+%     \end{align*}
+%     Iteratively apply the last relation written above, while also omit the variable $(x,y)$ for the enumerator,
+%     \begin{align*}
+%         A_{\mathcal{C}^\perp} &= (y-x) \left[(y-x) A_{\mathrm{Pun}_{n-1}(\mathrm{Pun}_n(\mathcal{C}))^\perp} + x A_{\mathrm{Sho}_n(\mathrm{Pun}_n(\mathcal{C}))^\perp}\right]\\
+%         &\;\;\;\;\;+ x\left[(y-x) A_{\mathrm{Pun}_n(\mathrm{Sho}_n(\mathcal{C}))^\perp} + x A_{\mathrm{Sho}_n(\mathrm{Sho}_n(\mathcal{C}))^\perp}\right] \\
+%         &= \sum_{i\in\{p,s\}^n} (y-x)^{(\#\text{ of $p$ in $i$})}x^{(\#\text{ of $s$ in $i$})} A_{\mathcal{C}_i},
+%     \end{align*}
+%     where the indices $p$ and $s$ in the string $i$ of length $n$ denote which word is punctured and shortened, respectively; we denote the enumerator $A_{\mathcal{C}_i}$ as the resulting code of length 0 from the puncturing and shortening, it has a value of either 0 or 1. Then,
+%      \begin{align*}
+%         A_{\mathcal{C}^\perp}(x,y) &= \sum_{s=0}^n \sum_{p=0}^{n-s} (y-x)^p x^s \left(\sum_{w\in\mathcal{C}}(w\text{ has $s$ 0's})\right) \\
+%         &= \sum_{w\in\mathcal{C}} \sum_{s=0}^{\#\text{ of 0's in $w$}} \sum_{p=0}^{n-s} (y-x)^px^s \\
+%         &=
+%     \end{align*}
+%     }
+% \end{proof}

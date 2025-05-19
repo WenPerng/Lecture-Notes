@@ -1,0 +1,103 @@
+\section{What is the Course About?}
+\begin{enumerate}
+    \item Introduce polar codes \& LDPC codes.
+    \item Analyze the performance of the two codes with probabilistic methods.
+    \begin{enumerate}[label=(\roman*)]
+        \item Martingale: used in the analysis of polar code.
+        \item Approximate Message passing: can be seen as a generalization to belief propagation, which is often used in the calculations of statistical physics.
+    \end{enumerate}
+\end{enumerate}
+
+\section{Grading}
+\begin{itemize}
+    \item Midterm exam: $30\%$
+    \item Final exam or project*: $30\%$
+    \item Homework: $40\%$
+\end{itemize}
+*Whether we want a final report in place of the exam is to be decided. The report will be to report a paper from conferences.
+
+Further, attendance can be counted as 0.5 pts per signature, and it is only used to increase your score lest you failed.
+
+The homework should be turned-in in PDF files on NTUCOOL, and should be treated as \LaTeX~practices. Recommended \LaTeX~compilers include Overleaf or VScode.
+
+\newpage
+
+\section{Topics and Schedules}
+Weekly plan (each bullet point is one week)
+\begin{enumerate}
+    \item Noisy-channel coding review
+    \begin{itemize}
+        \item Channel capacity
+        \item Finite block length tradeoff - Error exponent
+        \item Finite block length tradeoff - Scaling exponent
+    \end{itemize}
+    \item Polar Codes
+    \begin{itemize}
+        \item Ar{\i}kan's polar codes
+        \item introduction to Martingale
+        \item List decoding
+        \item Scaling exponent and error exponent of polar codes
+        \item Polar codes with larger matrices
+        \item (optional) Polar codes with larger alphabet
+        \item (optional) quantum polar codes
+    \end{itemize}
+    \item LDPC codes
+    \begin{itemize}
+        \item Belief Propagation
+        \item Introduction to Statistical mechanics
+        \item Approximate Message Passing
+        \item Spatially-coupled LDPC codes
+        \item Probabilistic group testing
+        \item (optional) quantum LDPC codes
+    \end{itemize}
+    \item Turbo codes (optional)
+\end{enumerate}
+
+\newpage
+
+
+\section{Style Guide}
+This is a reminder of the writing guidelines for the formatting of this lecture note.
+
+\begin{itemize}
+    \item \textbf{Bullet 1}: List titles should capitalize.
+    \item \textbf{Bullet 2}: The first letter is capitalized if treated as a complete sentence.
+\end{itemize}
+
+A couple of other mathematical environments are also commonly used:
+
+\begin{definition}[DEFINITION NAME] \label{def:w0_def}
+This is a definition.
+\end{definition} 
+
+\begin{theorem}[THEOREM NAME] \label{thm:w0_thm}
+This is a theorem.
+\begin{equation}
+    f(x) = x^2. \label{eq:w0_eq}
+\end{equation}
+\end{theorem}
+\begin{proof}
+    Derivation.
+\end{proof}
+
+\begin{lemma}[LEMMA NAME] \label{lem:w0_lem}
+This is a lemma
+\end{lemma}
+
+\begin{remark}[Remark NAME] \label{rmk:w0_rmk}
+This is a remark.
+\end{remark}
+
+One can reference using \autoref{def:w0_def}, \autoref{eq:w0_eq}, \autoref{thm:w0_thm}, \autoref{lem:w0_lem}, and \autoref{rmk:w0_rmk}.
+
+\begin{paper}
+    referencing a paper
+\end{paper}
+
+Lastly, unfinished texts can be \hl{highlighted}, important texts can be \textit{italized}.
+
+\vspace{1cm}
+\hrule
+\begin{summary}{0}
+    At the end of each week's lecture, a summary to the material is also given.
+\end{summary}

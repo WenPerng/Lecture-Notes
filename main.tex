@@ -1,0 +1,66 @@
+% load lecture note class
+\documentclass{lectureNotes}
+\usepackage{./template}
+
+\begin{document}
+\begin{titlepage}
+    \university{National Taiwan University}
+    \courseid{CommE5065}
+    \title{Modern Coding Theory \& Technology \\Lecture Note}
+% [needs frontpageimg]
+    \author{Wen Perng}
+    \version{2025 Spring}
+    \instructor{Instructor: Prof.~Hsin-Po Wang \par}
+    \maketitle
+\end{titlepage}
+
+\setcounter{page}{1}
+\addcontentsline{toc}{chapter}{About the Course}
+\begin{center}
+    {\Large\textbf{About the Course}}
+\end{center}
+\input{Chapters/abstract}
+\newpage
+
+% Depth to Table of Contents
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{An Invitation to Polar Codes}
+\input{Chapters/w1}
+\chapter{Polar Codes}
+\input{Chapters/w2}
+\input{Chapters/w3}
+\input{Chapters/w4-1}
+\chapter{Polar Code in Source Coding}
+\input{Chapters/w4-2}
+\input{Chapters/w5}
+\input{Chapters/w6-2}
+\chapter{Linear Codes}
+\input{Chapters/w6-1}
+\input{Chapters/w7}
+\input{Chapters/w9}
+\input{Chapters/w11-1}
+\chapter{Low Density Parity Check Code}
+\input{Chapters/w10-1}
+\input{Chapters/w11-2}
+\chapter{Other Topics}
+\input{Chapters/w10-2}
+\input{Chapters/w12}
+\input{Chapters/w13}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\addcontentsline{toc}{chapter}{Bibliography}
+\printbibliography
+\nocite{*}
+
+\appendix
+% \chapter{Weekly Summary} \label{sec:weekly_summary}
+% \input{Chapters/a1_weekly_summary}
+\chapter{Extra Proofs to Theorems and Lemmas}
+\input{Appendix/a2_McWilliams}
+\input{Appendix/a3_Catalan}
+
+\end{document}

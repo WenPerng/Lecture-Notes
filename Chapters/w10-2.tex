@@ -1,0 +1,117 @@
+\section{Entropy Complexity}
+\lecture{22 Apr.}
+
+This section considers the following task: given $\mathrm{Ber}(1/2)$, how do we generate $\mathrm{Ber}(1/3)$? But before any of that, why is the generation of a random variable so important? If the random numbers generated for security purposes are not ``random'' enough, attackers knowing this knowledge can tailor their attack design to make the encryption scheme especially vulnerable. The generation of a random number is so vital in many of our algorithm design that our societies cannot afford it breaking.
+
+A solution algorithm to the initial problem is shown below:
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzcd}
+	& {\text{ root}} \\
+	A && \bullet \\
+	& B && {\text{redo}}
+	\arrow["{1/2}"', from=1-2, to=2-1]
+	\arrow["{1/2}", from=1-2, to=2-3]
+	\arrow["{1/2}"', from=2-3, to=3-2]
+	\arrow["{1/2}", from=2-3, to=3-4]
+    \end{tikzcd}
+    \caption{Generating $\mathrm{Ber}(1/3)$ from $\mathrm{Ber}(1/2)$.}
+    \label{fig:w10_ber(1/3)}
+\end{figure}
+
+See the decision tree above in \autoref{fig:w10_ber(1/3)}. The algorithm starts at the root, and go to either left or right based on the output of a single $\mathrm{Ber}(1/2)$ trial. If ``redo'' is reached, one returns back to the root. The process is repeated until one lands on either $A$ or $B$. The probability of obtaining the two results is
+\begin{equation*}
+    \mathrm{Pr}\{A\}:\mathrm{Pr}\{B\} = \frac{1}{2}:\frac{1}{4}=2:1 \Rightarrow \mathrm{Pr}\{A\} = \frac{2}{3}, \mathrm{Pr}\{B\}=\frac{1}{3}.
+\end{equation*}
+
+This algorithm can be easily generalized. Suppose that we want to generate a random variable following $\mathrm{Pr}\{A\}:\mathrm{Pr}\{B\}:\mathrm{Pr}\{C\} = 1:2:3$, the algorithm can be drawn by a tree of height 3 (since $2^3 > 6 = 1 + 2 + 3$), as shown in the figure below:
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzcd}
+	&&&& {\text{root}} \\
+	&& \bullet &&&& \bullet \\
+	& \bullet && \bullet & {} & \bullet && \bullet \\
+	B & B & A & C && C & C & {\text{redo}} & {\text{redo}}
+	\arrow[from=1-5, to=2-3]
+	\arrow[from=1-5, to=2-7]
+	\arrow[from=2-3, to=3-2]
+	\arrow[from=2-3, to=3-4]
+	\arrow[from=2-7, to=3-6]
+	\arrow[from=2-7, to=3-8]
+	\arrow[from=3-2, to=4-1]
+	\arrow[from=3-2, to=4-2]
+	\arrow[from=3-4, to=4-3]
+	\arrow[from=3-4, to=4-4]
+	\arrow[from=3-6, to=4-6]
+	\arrow[from=3-6, to=4-7]
+	\arrow[from=3-8, to=4-8]
+	\arrow[from=3-8, to=4-9]
+    \end{tikzcd}
+    \caption{Generating $\mathrm{Pr}\{A\}:\mathrm{Pr}\{B\}:\mathrm{Pr}\{C\} = 1:2:3$ from $\mathrm{Ber}(1/2)$.}
+    \label{fig:w10_tree_1}
+\end{figure}
+
+The figure above is a waster of resource, however, and we don't really need to do $\mathrm{Ber}(1/2)$ as many times as it suggests. Of course! We can reduce the tree above to a simpler one below:
+\begin{figure}[H]
+    \centering
+    \begin{tikzcd}
+	&&& {\text{root}} \\
+	& \bullet &&&& \bullet \\
+	B && \bullet & {} & C && {\text{redo}} \\
+	& A && C
+	\arrow[from=1-4, to=2-2]
+	\arrow[from=1-4, to=2-6]
+	\arrow[from=2-2, to=3-1]
+	\arrow[from=2-2, to=3-3]
+	\arrow[from=2-6, to=3-5]
+	\arrow[from=2-6, to=3-7]
+	\arrow[from=3-3, to=4-2]
+	\arrow[from=3-3, to=4-4]
+    \end{tikzcd}
+    \caption{Reduced tree of \autoref{fig:w10_tree_1}.}
+\end{figure}
+
+Let the average number of trials in the above algorithm be $T$, it satisfies
+\begin{equation*}
+    T = 2\cdot \frac{1}{2} + 3\cdot \frac{1}{4} + 
+    T\cdot\frac{1}{4} \Rightarrow T= \frac{7}{3}.
+\end{equation*}
+This is the optimal algorithm for this example, but in general, how do we know if we can do better? Is there a theoretical bound?
+
+\begin{theorem}[(Knuth \& Yao, 1976) \cite{Complexity_Nonunif_Rand}]
+    The amount of bits needed to describe a discrete random variable $X$ is on average at most
+    \begin{equation}
+        H(X) + 2 \text{ bits}.
+    \end{equation}
+\end{theorem}
+This describes the \textit{entropy complexity} of a random variable. To demonstrate, consider the following example:
+\begin{example}
+    The worst case possible is if the distribution is the extreme case where the denominator of the distribution is $2^{k}+1$, then we need a tree of $k+1$ layers. Say $\mathrm{Pr}\{A\}:\mathrm{Pr}\{B\} = 2^k:1$, then expected number of $\mathrm{Ber}(1/2)$ trials will be
+    \begin{align*}
+        x &= \frac{1}{2} + \frac{1}{2^2}(x+1)+\frac{1}{2^3}(x+2)+\cdots+\frac{1}{2^{k+1}}(x+k)+\frac{k+1}{2^{k+1}} \\
+        &= \frac{1}{2}\left(1+\frac{k+1}{2^k}\right) + \frac{1}{2}\left(2-\frac{k}{2^k} - \frac{1}{2^{k-1}}\right) + x\left(1-\frac{1}{2^{k}}\right) \\
+        \rightarrow x &= \frac{2-(k+2)/2^k}{1-1/2^k}.
+    \end{align*}
+    The entropy is
+    \begin{equation*}
+        H(X) = \frac{2^k}{2^k+1}\lg\left(\frac{2^k+1}{2^k}\right) + \frac{1}{2^k+1}\lg(2^k+1).
+    \end{equation*}
+    We have $x-H(X)$ strictly increasing, and its limit is
+    \begin{equation}
+        x - H(X) \xrightarrow{k\rightarrow\infty} 2 \text{ bits}. 
+    \end{equation}
+\end{example}
+
+It seems like $H(X)+2$ is the best guarantee that we can have, and the extra cost of 2 bits is inevitable. Or is it? Given a random vector $Y = (X_1,X_2)$, where $X_1$ and $X_2$ are both i.i.d. copies of $X$. Then, by the theorem above, we will only need
+\begin{equation*}
+    H(Y) + 2 = 2\left(H(X)+1\right) \text{ bits}.
+\end{equation*}
+On average, we only need $H(X)+1$ times $\mathrm{Ber}(1/2)$ to generate each $X$. If we want to generate $n$ copies of $X$, then the amount of trials needed becomes $H(X)+\frac{2}{n}$. In the limit, we can achieve the entropy. For example, to simulate rolling a dice, you would need $7+1/3$ times $\mathrm{Ber}(1/2$ trials; however, if you were to simulate two rolls of a dice, you only need to do the Bernoulli trial $13 + 1/3$ times \cite{Complexity_Nonunif_Rand}.
+
+Though we saved the number of Bernoulli trials (the entropy complexity), it tradeoffs with a higher computational complexity.
+
+\begin{remark}
+    In the 1976 work by Knuth and Yao \cite{Complexity_Nonunif_Rand}, they discussed the optimality of generating any finite or countably infinite set of rational or irrational probabilities. It is definitely worth a read if one wishes to seek deeper understanding of the topic.
+\end{remark}

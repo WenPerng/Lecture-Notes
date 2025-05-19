@@ -1,0 +1,138 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Adapted from homework template written by I-Hsiang Wang, 2023.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \usepackage[a4paper, hmargin=2cm, vmargin={2cm,1cm}, includehead, includefoot]{geometry}
+
+% \usepackage[backend=biber, style=alphabetic, sorting=ynt]{biblatex}
+
+\usepackage[backend=biber, sorting=none, style=alphabetic]{biblatex}
+\addbibresource{refs.bib}
+
+\usepackage{amsmath,amssymb,mathrsfs}
+\usepackage{amsthm}
+\usepackage{epsfig,epsf,graphicx,graphics}
+\usepackage{esint,commath,amssymb,cancel,mathtools}
+\usepackage{tikz,tikz-cd}
+\usepackage{url}
+\usepackage{array}
+\usepackage{arydshln} % arraydashline
+\usepackage{multicol,tabularx}
+\usepackage{empheq}
+\usepackage{bbm}
+\usepackage{color}
+\usepackage{float}
+\usepackage{subfig}
+\usepackage{framed}
+\usepackage{bm}
+\usepackage{dsfont}
+\usepackage{enumitem}
+\usepackage{thmtools}
+\usepackage{mdframed}
+\usepackage{hyperref}
+\hypersetup{colorlinks,breaklinks,
+            linkcolor=[RGB]{0,0,205},
+            citecolor=[RGB]{34,139,34},
+            urlcolor=[RGB]{0,0,128}
+            }
+% \usepackage{cite} % to combine citations
+\usepackage[labelsep=space]{caption} % 'space' after Fig. or Tab. caption
+
+%-----tables-----
+\usepackage{diagbox} %diagonal slash in table
+\usepackage{multirow}
+
+\usepackage[counterclockwise, figuresleft]{rotating} % rotate large images
+
+\graphicspath{{figures/}{../figures/}}
+
+\renewcommand{\qedsymbol}{$\blacksquare$}
+
+
+
+\allowdisplaybreaks
+
+%\setlength\parindent{0pt}
+
+\setlist[enumerate]{topsep=1ex, itemsep=0.5ex, parsep=1ex, label=(\alph*)} %leftmargin=*,
+% \setlist[itemize]{topsep=1ex, itemsep=0.5ex, parsep=1ex}%leftmargin=*, 
+
+
+% Assorted theorem/proof environments
+%\input{../theoremstylesheet.tex}
+
+%-------------------------------%
+\definecolor{shadecolor}{gray}{0.85}
+\definecolor{lightshadecolor}{gray}{0.95}
+\newenvironment{paper}{
+    \vspace{0.3cm}
+    \begin{mdframed}[backgroundcolor=lightshadecolor, linewidth=0pt, innertopmargin=12pt, innerbottommargin=12pt]
+    \textbf{Referenced Paper:}\\
+}{
+    \end{mdframed}
+}
+\newenvironment{summary}[1]{
+    \begin{mdframed}[backgroundcolor=lightshadecolor, linewidth=0pt, innertopmargin=12pt, innerbottommargin=12pt]
+    \textbf{Weekly Summary (week {#1}):}\\
+}{
+    \end{mdframed}
+}
+
+
+
+\newenvironment{example}{
+    \par\noindent\ignorespaces
+    \textbf{Example:}
+}{
+    $\hfill\square$\par
+}
+%-------------------------------%
+\DeclareMathOperator{\defeq}{\vcentcolon=}
+\DeclareMathOperator{\eqdef}{=\vcentcolon}
+\DeclareMathOperator{\arctanh}{\mathrm{arctanh}}
+\newcommand{\diff}[2]{\frac{\mathrm{d}{#1}}{\mathrm{d}{#2}}}
+\newcommand{\pdiff}[2]{\frac{\partial{#1}}{\partial{#2}}}
+\newcommand{\QED}{\;\;\;\;\;\blacksquare}
+\newcommand{\QEDline}{$\hfill\blacksquare$}
+\newcommand{\transpose}{\mathsf{T}}
+\newcommand{\hermitian}{\mathsf{H}}
+\newcommand{\ee}{\mathrm{e}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\trace}[1]{\mathrm{Tr}\left\{{#1}\right\}}
+\newcommand{\setdef}[2]{\left\{\,{#1}\,\middle\vert\,{#2}\,\right\}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}} %bold font physics vector
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+
+\newcommand{\um}{\text{\textmu m}}
+
+%% modern coding theory
+\DeclareMathOperator{\ostar}{\textcircled{$\star$}}
+\DeclareMathOperator{\boxstar}{
+    \tikz[baseline=(char.base)]{
+        \node[shape=rectangle,draw,inner sep=1pt] (char) {$\star$};
+    }
+}
+
+%-----tables-----
+\usepackage{diagbox} %diagonal slash in table
+\usepackage{multirow}
+
+
+
+% %------------------------------------------%
+% Comments
+% \def\wen{\textcolor{cyan}}
+\def\hl{\textcolor{red}}
+
+% Change "Equation n" to "Eq. (n)"
+\makeatletter
+\def\tagform@#1{\maketag@@@{\ignorespaces#1\unskip\@@italiccorr}}
+\let\orgtheequation\theequation
+\def\theequation{(\orgtheequation)}
+\makeatother
+
+% figure counter
+\counterwithin{figure}{chapter}
+\renewcommand\thefigure{\thechapter.\arabic{figure}}
+

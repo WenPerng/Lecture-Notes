@@ -1,0 +1,94 @@
+\section{MacWilliams' Identity}
+
+The following proofs follows from the paper ``Weight Enumeration and the Geometry of Linear Codes'' \cite{Greene} by C. Greene.
+
+\subsection{Corank-Nullity Generating Function of the Dual Code} \label{app:Whitney}
+This is an alternate proof to \autoref{lem:w7_corank_nullity}.
+
+\begin{proof}
+    Denote $E=\{1,2,\ldots,n\}$ be the indices and $S$ a subset of $E$. We denote $r(S)$ the rank of the columns $S$ of a generator matrix of a code $\mathcal{C}$, and $r^*(S)$ the rank of the columns $S$ of a generator matrix of the dual code $\mathcal{C}^\perp$.
+
+    A result from \textit{matroid theory} states that
+    \begin{equation}
+        r^*(S) = \abs{S} + r(E\backslash S) - r(E).
+    \end{equation}
+    This equation is related to Tutte-Grothedieck invariance, and is in essence, derived from combinatorics arguments. Hence, this proof actually still uses counting. Nevertheless, let us assume that this equation is known and continue on.
+
+    Let us consider the corank-nullity generating function of the dual code:
+    \begin{align*}
+        W_{\mathcal{C}^\perp}(x,y) &= \sum_{S\subseteq E} x^{r^*(G) - r^*(S)} y^{\abs{S} - r^*(S)} \\
+        &= \sum_{S\subseteq E} x^{(n-k) - (\abs{S} + r(E\backslash S) - r(G))} y^{\abs{S} - (\abs{S} + r(E\backslash S) - r(G))} \\
+        &= \sum_{S\subseteq E} y^{r(G) - r(E\backslash S)} x^{(n-\abs{S}) - r(E\backslash S)} = W_\mathcal{C}(y,x).
+    \end{align*}
+    Thus it is shown.
+\end{proof}
+
+
+\subsection{Greene's Lemma} \label{app:Greene}
+This is an alternate proof to \autoref{lem:w7_Greene}.
+
+\begin{proof}
+    Let $E=\{1,2,\ldots,n\}$ be the indices for a codeword. The support of a codeword $c\in\mathcal{C}$ is defined as
+    \begin{equation*}
+        \mathrm{supp}(c) \defeq \setdef{i\in E}{c_i=1}.
+    \end{equation*}
+    The weight enumerator can then be rewritten as
+    \begin{equation*}
+        A_\mathcal{C}(x,y) = \sum_{S\subseteq E} \#\setdef{c\in\mathcal{C}}{\mathrm{supp}(c)=S} x^{\abs{S}} y^{n-\abs{S}}.
+    \end{equation*}
+    The RHS of the statement can then be reduced to
+    \begin{align*}
+        (y-x)^kx^{n-k} W_\mathcal{C}\left(\frac{2x}{y-x},\frac{y-x}{x}\right) &= \sum_{T\subseteq E} 2^{k-r(T)} x^{n-\abs{T}} (y-x)^{\abs{T}} \\
+        &= \sum_{T\subseteq E}\sum_{m=0}^{\abs{T}} (-1)^{\abs{T}-m} 2^{k-r(T)} \binom{\abs{T}}{m} x^{n-m} y^m \\
+        &= \sum_{T\subseteq E} \sum_{S\subseteq T} (-1)^{\abs{T}-\abs{S}} 2^{k-r(T)} x^{n-\abs{S}}y^{\abs{S}} \\
+        &= \sum_{S\subseteq E} \sum_{T\supseteq S} (-1)^{\abs{T}-\abs{S}} 2^{k-r(T)} x^{n-\abs{S}}y^{\abs{S}}.
+    \end{align*}
+    Next, we replace $S\mapsto S^\mathrm{c}$ and $T\mapsto T^\mathrm{c}$,
+    \begin{align*}
+        &= \sum_{S^\mathrm{c}\subseteq E} \sum_{T^\mathrm{c}\supseteq S^\mathrm{c}} (-1)^{\abs{T^\mathrm{c}}-\abs{S^\mathrm{c}}} 2^{k-r(T^\mathrm{c})} x^{n-\abs{S^\mathrm{c}}}y^{\abs{S^\mathrm{c}}} \\
+        &= \sum_{S\subseteq E} \left(\sum_{T\subseteq S} (-1)^{\abs{S}-\abs{T}} 2^{k-r(T^\mathrm{c})}\right) x^{\abs{S}} y^{n-\abs{S}}.
+    \end{align*}
+    We need to show that the term in the bracket is equal to $\#\setdef{c\in\mathcal{C}}{\mathrm{supp}(c)=S}$. This can easily be done by introducing the following lemma.
+    \begin{lemma}[M{\"o}bius Inversion]
+        For set functions $f$ and $g$, we have
+        \begin{equation}
+            f(S) = \sum_{T\subseteq S} (-1)^{\abs{S}-\abs{T}} g(T) \Leftrightarrow g(S) = \sum_{T\subseteq S} f(T).
+        \end{equation}
+    \end{lemma}
+    \textit{Proof. (M\"obius inversion)}\;
+        The lemma is simply proven below:
+        \begin{align*}
+            \sum_{T\subseteq S} (-1)^{\abs{S}-\abs{T}} \sum_{V\subseteq T} f(V) &= \sum_{V\subseteq S} \sum_{T\supseteq V} (-1)^{\abs{S}-\abs{T}} f(V) \\
+            &= \sum_{V\subseteq S} (-1)^{\abs{S}-\abs{V}} f(V) \sum_{m=0}^{\abs{S}-\abs{V}} \binom{\abs{S}-\abs{V}}{m} (-1)^m \\
+            &= \begin{dcases}
+                \sum_{V\subseteq S} (-1)^{\abs{S}-\abs{V}} f(V) (1-1)^{\abs{S}-\abs{V}} = 0, &S\neq V;\\
+                \sum_{V = S} (-1)^{\abs{S}-\abs{V}} f(V) = f(S), &S=V.
+            \end{dcases}\;\;\;\;\;\square
+        \end{align*}
+        
+    % \end{proof}
+    With the lemma proven, let us continue with the proof of Greene's lemma. Let the set functions be $f(S) = \#\setdef{c\in\mathcal{C}}{\mathrm{supp}(c)=S}$ and $g(S) = 2^{k-r(S^\mathrm{c})}$. Since
+    \begin{align*}
+        \sum_{T\subseteq S} \#\setdef{c\in\mathcal{C}}{\mathrm{supp}(c)=T} &= \#\setdef{c\in\mathcal{C}}{\mathrm{supp}(c)\subseteq S} = 2^{k-r(S^\mathrm{c})},
+    \end{align*}
+    where the last equality is obtained since the generator matrix can be written in the full rank form below through column operations:
+    \begin{equation*}
+        G = \left[\begin{array}{c:c}
+            \mathbb{F}_2^{r(S^\mathrm{c})\times\abs{S}} & \mathbb{F}_2^{r(S^\mathrm{c})\times(n-\abs{S})} \vspace{0.1cm} \\ \hdashline 
+            \mathbb{F}_2^{r(S)\times\abs{S}} & 0
+        \end{array}\right] \in\mathbb{F}_2^{k\times n}.
+    \end{equation*}
+    The Greene's lemma is finally proven by applying M\"obius inversion.
+\end{proof}
+
+\subsection{MacWilliam's Identity}  \label{app:MacWilliams}
+This is an alternate proof to \autoref{thm:w6_McWilliams}.
+\begin{proof}
+    By directing applying the two lemmas above:
+    \begin{align*}
+        \frac{1}{\abs{\mathcal{C}}}A_{\mathcal{C}}(y-x,y+x) &= \frac{1}{2^k} (2x)^k(y-x)^{n-k} W_\mathcal{C}\left(\frac{y-x}{x},\frac{2x}{y-x}\right) \\
+        &= x^k (y-x)^{n-k} W_{\mathcal{C}^\perp}\left(\frac{2x}{y-x},\frac{y-x}{x}\right) \\
+        &= A_{\mathcal{C}^\perp}(x,y).
+    \end{align*}
+\end{proof}
+

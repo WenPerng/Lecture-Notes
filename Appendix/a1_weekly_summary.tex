@@ -1,0 +1,49 @@
+\begin{summary}{1}
+    During the first week, the lecturer gave an introduction to how Ar{\i}kan came up with turbo code: as a means to increase the cutoff rate. However, the separation of a channel into sub-channels of inner code is so effective that the outer code can be neglected as a whole. 
+    
+    An example of given to illustrate the observations is the binary erasure channel. We showed that it is capacity achieving, with capacity of the sub-channels quickly polarize into useful and useless ones.
+
+    The properties of capacity-achieving and polarization is to be discussed in future lectures. One should also pay heeds to the tradeoff between $R$, $p$, and $N$ in coding theory (and their correspondence to deviation theory).
+\end{summary}
+
+\begin{summary}{2}
+    The Chernoff bound is really useful in showing the achievability of zero error probability in the limit of $n\rightarrow 0$.
+
+    It is truly amazing how the polar code decoder works. Further, the architecture of its structure is also worth noting, especially how the reordering is done in both encoding and decoding stages. The design of the structure is related to how the decoder is defined.
+\end{summary}
+
+\begin{summary}{3}
+    The sequential decoding of polar code is: first decode, then send back true values via encoder. The bad channels can be set to have frozen bits so as to be sure of their true values.
+
+    The polarization process of polar code over BEC is a martingale.
+
+    The parallel and serial combination of a BSC is linked to the good and bad sub-channels of polar code. Moreover, the result can be generalized to other channels by the fact that all BMSC can be decomposed into convex combination of BSCs.
+\end{summary}
+
+\begin{summary}{4}
+    This week, we reviewed the maximum inequality from martingale theory. Moreover, generalized versions of the concentration inequality, namely the Azuma's and McDiarmid's inequalities are also introduced.
+
+    Next, we introduced various methods of source coding. The proof for the different methods are all very much similar. One thing to note is that polar code, besides being capacity-achieving for noisy-channel coding, also proven to be very useful in source coding.
+\end{summary}
+
+\begin{summary}{5}
+    Many new channel parameters are proposed, forming martingales and supermartingales. Many of the inequalities and equalities still requires further study of their details to make sure that they are in fact written correctly.
+    
+    By switching between the parameters, one can relate with the polar transformation introduced very early on. Interestingly, we also discussed how, in real life, the polar decoder is implemented using log likelihood ratios.
+
+    Lastly, we discussed the topic of distributed source coding, where the Slepian-Wolf algorithm is of huge importance. We left of with the result of its rate region and a brief illustration of the algorithm.
+\end{summary}
+
+\begin{summary}{6}
+    This week starts off with the algebra of linear code. The duality of codes is also an interesting property worth investigating. The MacWilliams' identity is also stated without a complete proof. I should spend some time investigate how to prove it.
+
+    Next, many results surrounding polar code were given. The first one was regarding the ``eigenvalue problem'' of the polarization speed. Some details to the proof were glossed over, and simulation is required to convince myself of the result.
+
+    Another result that I still cannot really trust is that for polar codes of large kernels, the sequence $\sqrt{Z_n\wedge\varepsilon}$ is a supermartingale. It is truly amazing how we can just ``construct'' martingales. Speaking of construction, the proof of $Z(W_1\ostar W_2)$ and $T(W_1\boxstar W_2)$ from last week also uses constructed random variables, they require further examination.
+
+    Last result is about the source-channel joint coding property of polar codes. I can understand but can't really accept logically the results brought up. Should spend time look up the paper by Honda and Yamamoto.
+\end{summary}
+
+\begin{summary}{7}
+    The mock test is hard, but it sheds light on many of the previous not-yet-proven results that we have mentioned in the class. These include the proof to MacWilliams' identity and the fact that the dual of Reed-Muller code is still Reed-Muller.
+\end{summary}

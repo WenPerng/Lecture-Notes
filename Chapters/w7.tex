@@ -1,0 +1,196 @@
+\lecture{1 Apr.}
+
+\begin{definition}[Corank-Nullity Generating Function]
+    Let $G\in\mathbb{F}_2^{k\times n}$ be a generator matrix of an $[n,k]$-linear code $\mathcal{C}$. The \textit{corank-nullity generating polynomial} of $\mathcal{C}$ is
+    \begin{equation}
+        W_\mathcal{C}(x,y) \defeq \sum_{S\subseteq E}x^{k-r(S)}y^{\abs{S}-r(S)}.
+    \end{equation}
+    The notation $W$ is after Whitney, as $W_\mathcal{C}$ is also known as the Whitney rank generating function. The sum enumerates over all subsets $S$ of the columns of $G$ where $E=\{1,2,\ldots,n\}$, $\abs{S}$ is the number of columns in $S$, and $r(S)$ is the rank of $G$ restricted to the columns $S$. Usually, $k-r(S)$ is called the \textit{corank}, and $\abs{S}-r(S)$ is called the \textit{nullity}.
+\end{definition}
+
+\begin{definition}[Tutte Polynomial]
+    The \textit{Tutte polynomial} of $\mathcal{C}$ is
+    \begin{equation}
+        T_\mathcal{C}(x,y) \defeq \sum_{S\subseteq E}(x-1)^{k-r(S)}(y-1)^{\abs{S}-r(S)}.
+    \end{equation}
+\end{definition}
+Note that Tutte and Whitney polynomials are the same thing with a small change of variables.
+
+\begin{lemma}
+    The corank-nullity generating function of a code $\mathcal{C}$ is independent of the generator matrix $G$ used. Hence it is well defined.
+\end{lemma}
+The above lemma can easily be shown by observing that adding redundant rows or applying linear combinations over the rows of a generating matrix do not affect the $k$, $r(S)$ and $\abs{S}$ of a given subset of columns.
+
+The corank-nullity generating function is introduced as a tool for us to proof the MacWilliams' identity. By proving the following two lemmas over its symmetry and its relation with the weight enumerator, we will finally obtain the MacWilliams' identity.
+\begin{lemma}[Corank-Nullity Generating Function of the Dual Code] \label{lem:w7_corank_nullity}
+    For $\mathcal{C}^\perp$ the dual code of $\mathcal{C}$,
+    \begin{equation}
+        W_{\mathcal{C}^\perp}(x,y) = W_\mathcal{C}(y,x).
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    In this proof, we will try to relate $\mathcal{C}$ with $\mathrm{Pun}_n(\mathcal{C})$ and $\mathrm{Sho}_n(\mathcal{C})$, finally obtaining the result via induction. Three different cases can be considered:
+    \begin{itemize}
+        \item If \ref{w6:A-1}, then we separate $S$'s into those that include the $n$th column and those that doesn't. Since $k_{\mathrm{P}_n(\mathcal{C})}=k_\mathcal{C}$, $r(S)_{\mathrm{P}_n(\mathcal{C})}=r(S)_{\mathcal{C},S \text{ without col. }n} = r(S)_{\mathcal{C},S \text{ with col. }n}$, $\abs{S}_{\mathrm{P}_n(\mathcal{C})} = \abs{S}_{\mathcal{C}, S \text{ without col.n}}$, and $\abs{S}_{\mathrm{P}_n(\mathcal{C})} = \abs{S}_{\mathcal{C}, S \text{ with col.n}} -1$,
+        \begin{equation*}
+            W_\mathcal{C}(x,y) = W_{\mathcal{C}, S \text{ without col. } n}(x,y) + W_{\mathcal{C}, S \text{ with col. } n}(x,y) = (1+y) W_{\mathrm{P}_n(\mathcal{C})}(x,y).
+        \end{equation*}
+        \item If \ref{w6:A-2}, since $k_{\mathrm{S}_n(\mathcal{C})}=k_\mathcal{C}-1$, $r(S)_{\mathrm{S}_n(\mathcal{C})}=r(S)_{\mathcal{C},S \text{ without col. }n} = r(S)_{\mathcal{C},S \text{ with col. }n}-1$, $\abs{S}_{\mathrm{S}_n(\mathcal{C})} = \abs{S}_{\mathcal{C}, S \text{ without col.n}}$, and $\abs{S}_{\mathrm{S}_n(\mathcal{C})} = \abs{S}_{\mathcal{C}, S \text{ with col.n}} -1$,
+        \begin{equation*}
+            W_\mathcal{C}(x,y) = (1+x) W_{\mathrm{S}_n(\mathcal{C})}(x,y).
+        \end{equation*}
+        \item If \ref{w6:A-3}, then
+        \begin{equation*}
+            W_\mathcal{C}(x,y) = W_{\mathrm{P}_n(\mathcal{C})}(x,y) + W_{\mathrm{S}_n(\mathcal{C})}(x,y).
+        \end{equation*}
+    \end{itemize}
+    Then the lemma can easily be proven via induction.
+\end{proof}
+\begin{lemma}[(Greene's)] \label{lem:w7_Greene}
+    The weight enumerator polynomial and the corank-nullity generating function can be related by
+    \begin{equation}
+        A_\mathcal{C}(x,y) = (y-x)^kx^{n-k} W_\mathcal{C}\left(\frac{2x}{y-x},\frac{y-x}{x}\right).
+    \end{equation}
+\end{lemma}
+\begin{proof}
+    Again consider the three cases \ref{w6:A-1}, \ref{w6:A-2}, and \ref{w6:A-3}. The lemma can be proven by utilizing induction on the decomposition of a code $\mathcal{C}$ into its subcodes $\mathrm{Pun}_n(\mathcal{C})$ and $\mathrm{Sho}_n(\mathcal{C})$ and the subsequent decomposition of $A_\mathcal{C}$ and $W_\mathcal{C}$ seen in the proofs of \autoref{thm:w6_McWilliams} and \autoref{lem:w7_corank_nullity}, respectively.
+\end{proof}
+
+For a more elegant proof of the two lemmas above, see \aref{app:Whitney} and \aref{app:Greene}. These two lemmas can be used to give a cleaner derivation of the MacWilliams' identity, which is presented in \aref{app:MacWilliams}.
+
+
+
+
+
+
+
+
+\section{Dual of Reed--Muller and Reed--Solomon Code} \label{sec:w7_RM_RS}
+
+This section proves the statement regarding the dual of a Reed--Muller code mentioned back in \autoref{rmk:w6_RM_self_dual}. Along the way, we will ways to re-characterize the Reed--Muller code, and also introducing the Reed--Solomon which is very much similar.
+
+Here we begin by providing a different definition to the Reed--Muller code from the one provided in \autoref{sec:RMcode}.
+\begin{definition}[Reed--Muller Code]
+    The Reed--Muller code is defined as
+    \begin{equation}
+        \mathrm{RM}(r,m) = \setdef{\left(f(0),f(1),\ldots,f(2^m-1)\right)}{f\in\mathbb{F}_2[x_1,\ldots,x_m]^{\le r}\text{ where }x_i\in\mathbb{F}_2}.
+    \end{equation}
+    The set $\mathbb{F}_2[x]^{\le r}$ denotes the polynomials in $x$ with degree less than or equal to $r$.
+\end{definition}
+
+\begin{example}
+    Consider $\mathrm{RM}(2,3)$, we have the following monomials as a basis to all $f\in\mathbb{F}_2[x_1,x_2,x_3]^{\le2}$, the respective codewords are as follows.
+    \begin{equation*}
+    \begin{array}{c|c}
+        f & \left(f(000),f(001),f(010),f(011),f(100),f(101),f(110),f(111)\right) \\ \hline
+        0 & (0,0,0,0,0,0,0,0) \\
+        1 & (1,1,1,1,1,1,1,1) \\
+        x_1 & (0,0,0,0,1,1,1,1) \\
+        x_2 & (0,0,1,1,0,0,1,1) \\
+        x_3 & (0,1,0,1,0,1,0,1) \\
+        x_1x_2 & (0,0,0,0,0,0,1,1) \\
+        x_1x_3 & (0,0,0,0,0,1,0,1) \\
+        x_2x_3 & (0,0,0,1,0,0,0,1)
+    \end{array}
+    \end{equation*}
+    All other codewords can be generated as linear combination of the bases above.
+\end{example}
+\begin{theorem}[Minimum Distance of RM]
+    The minimum distance of $\mathrm{RM}(r,m)$ is $2^{m-r}$.
+\end{theorem}
+\begin{proof}
+    Can be shown by induction on $r$.
+\end{proof}
+
+\begin{theorem}[Dual of RM]
+    The dual code to the Reed--Muller code $\mathrm{RM}(r,m)$ is again another Reed--Muller code:
+    \begin{equation}
+        \mathrm{RM}(r,m)^\perp = \mathrm{RM}(m-r-1,m).
+    \end{equation}
+\end{theorem}
+\begin{proof}
+    Consider a $g$ a polynomial in $x_1,\ldots,x_m$ with $\mathbb{F}_2$ coefficients that should generate the dual code to $\mathrm{RM}(r,m)$. Then for all $f\in\mathbb{F}_2[x_1,\ldots,x_m]^{\le r}$, $g$ should satisfy
+    \begin{equation*}
+        \sum_{i=0}^{2^m-1} f(i) g(i) = 0.
+    \end{equation*}
+    The dimension of all possible $g$ is then
+    \begin{align*}
+        \dim\mathrm{RM}(r,m)^\perp &= 2^m - \underbrace{\left[\binom{m}{0} + \binom{m}{1} + \cdots + \binom{m}{r}\right]}_{\dim\mathrm{RM}(r,m)} \\
+        &= \binom{m}{r+1} + \ldots + \binom{m}{m} = \binom{m}{m-r-1} + \binom{m}{0} = \dim\mathrm{RM}(m-r-1,m).
+    \end{align*}
+\end{proof}
+
+\begin{definition}[Reed--Solomon Code]
+    A Reed--Solomon code is defined with $n$ distinct points $a_1,\ldots,a_n\in\mathbb{F}_p$ as follows
+    \begin{equation}
+        \mathrm{RS}(a_{1:n},k) = \setdef{\left(f(a_1),\ldots,f(a_n)\right)}{f\in\mathbb{F}_p[x]^{<k}}.
+    \end{equation}
+\end{definition}
+\begin{theorem}[Minimum Distance of RS]\label{thm:w7_RS_min_dist}
+    The minimum distance of $\mathrm{RS}(a_{1:n},k)$ is $n-k+1$.
+\end{theorem}
+\begin{proof}
+    Consider the degrees of freedom: a degree $k-1$ single variable polynomial is uniquely defined by $k$ parameters.
+\end{proof}
+
+The dual of a Reed--Solomon code is not exactly another Reed--Solomon code. Some extensions are needed.
+\begin{definition}[Generalized Reed--Solomon Code]
+    A generalized Reed--Solomon code is defined with $2n$ distinct points $a_1,\ldots,a_n,b_1,\ldots,b_n\in\mathbb{F}_p$ as follows
+    \begin{equation}
+        \mathrm{GRS}(b_{1:n},a_{1:n},k) = \setdef{\left(b_1f(a_1),\ldots,b_nf(a_n)\right)}{f\in\mathbb{F}_p[x]^{<k}}.
+    \end{equation}
+\end{definition}
+
+\begin{theorem}[Dual of GRS]\label{thm:w7_dual_GRS}
+    The dual code to the generalized Reed--Solomon code is again another generalized Reed--Solomon code:
+    \begin{equation}
+        \mathrm{GRS}(b_{1:n},a_{1:n},k)^\perp = \mathrm{GRS}(c_{1:n},a_{1:n},n-k),
+    \end{equation}
+    where $c_i^{-1} = b_i\prod_{j\neq i}(a_j-a_i)$.
+\end{theorem}
+\begin{proof}
+    For a code $\mathcal{C} = \mathrm{GRS}(b_{1:n},a_{1:n},k)$, consider another code $$\mathcal{C}' = \setdef{\left(c_1,f(a_1),\ldots,c_nf(a_n)\right)}{ f\in \mathbb{F}_p[t]^{<n-k}} = \mathrm{GRS}(c_{1:n},a_{1:n},n-k).$$ If codewords from $\mathcal{C}'$ were to be orthogonal to $\mathcal{C}$, then we only need to demonstrate the orthogonality of the bases: the monomials. Consider the monomials $g(t) = t^\ell \in \mathbb{F}_p[t]^{<n-k}$ and $f(t) = t^m \in \mathbbm{F}_p[t]^{<k}$, we have that $\ell+m<n-1$, and 
+    \begin{equation*}
+        0 = \sum_{i=1}^n b_if(a_i) \cdot c_ig(a_i) = \sum_{i=1}^n c_ib_i a_i^{\ell+m}.
+    \end{equation*}
+    Since the number of variables is $n$ and the number of constraints is $n-1$, a single non-zero solution for $c_i$(including its span) exists. Hence, $\mathcal{C}'\subseteq \mathcal{C}^\perp$. Lastly, by checking the dimension: $\dim\mathcal{C}' = n-k = \dim\mathcal{C}^\perp$, we can now state for sure that $\mathcal{C}'=\mathcal{C}^\perp$.
+
+    The value to $c_i$ can be directly found by solving
+    \begin{equation*}
+        \left[\begin{matrix}
+            1 & 1 & \cdots & 1 \\
+            a_1 & a_2 & \cdots & a_n \\
+            \vdots & \vdots & \ddots & \vdots \\
+            a_1^{n-2} & a_2^{n-2} & \cdots & a_n^{n-2}
+        \end{matrix}\right] \left[\begin{matrix}
+            b_1c_1 \\ b_2c_2 \\ \vdots \\ b_nc_n
+        \end{matrix}\right] = \left[\begin{matrix}
+            0 \\ 0 \\ \vdots \\ 0
+        \end{matrix}\right].
+    \end{equation*}
+    We can add an ancillary constraint such that
+    \begin{equation}
+        \left[\begin{matrix}
+            1 & 1 & \cdots & 1 \\
+            a_1 & a_2 & \cdots & a_n \\
+            \vdots & \vdots & \ddots & \vdots \\
+            a_1^{n-1} & a_2^{n-1} & \cdots & a_n^{n-1}
+        \end{matrix}\right] \left[\begin{matrix}
+            b_1c_1 \\ b_2c_2 \\ \vdots \\ b_nc_n
+        \end{matrix}\right] = \left[\begin{matrix}
+            0 \\ 0 \\ \vdots \\ 1
+        \end{matrix}\right]. \label{eq:w7_vandermonde}
+    \end{equation}
+    Now we can utilize what we know about the Vandermonde determinant to aid our analysis:
+    \begin{equation*}
+        \left[\begin{matrix}
+            b_1c_1 \\ b_2c_2 \\ \vdots \\ b_nc_n
+        \end{matrix}\right] = \frac{1}{\Pi_{j>i}(a_j-a_i)} \left[\begin{matrix}
+            \Pi_{j>i\neq 1}(a_j-a_i) \\
+            \Pi_{j>i\neq 2}(a_j-a_i) \\
+            \vdots \\
+            \Pi_{j>i\neq n}(a_j-a_i)
+        \end{matrix}\right].
+    \end{equation*}
+    Hence, $b_ic_i= [\Pi_{j\neq i}(a_j-a_i)]^{-1}$. The inclusion of 1 in \autoref{eq:w7_vandermonde} is arbitrary, and any multiple of it works.
+\end{proof}
