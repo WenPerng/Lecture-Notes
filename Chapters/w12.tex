@@ -12,7 +12,7 @@ where $\vec{1}\in\mathbb{R}^{n\times1}$ is the vector of ones.
 Besides using the \textit{activation function} $\min(\cdot,1)$, one can opt for arbitrary functions of similar behavior. For example, the ReLU, sigmoid, or $\arctan$ are some suitable replacements. All that is needed is the monotonicity of the activation function. For more information, please refer to the reference \cite{Generalized_Group_Testing}.
 
 \subsection{Applications of Group Testing}
-The study of group testing originated during the WWI\!I, where it is used to reduce the amount of test required to find out syphilitic males in soldiers. Nowadays, its applications become almost pervasive, appearing in every corner of modern science. Some examples are listed below, with special emphasis put on heavy hitters and bloom filter.
+The study of group testing originated from WWI\!I, where it is used to reduce the amount of test required to find out syphilitic males in soldiers. Nowadays, its applications become almost pervasive, appearing in every corner of modern science. Some examples are listed below, with special emphasis put on heavy hitters and bloom filter.
 
 \paragraph{Genotyping:} The task of genotyping is to find out whether you have a certain strand of gene that, for example, may cause cancer. The human DNA consists of around 3 billion base pairs, it is too costly and impossible to test one-by-one whether a sequence of gene appears in the DNA. Instead, we can use group testing to aid our task. Given a solution of one's DNA, we can apply the CRISPR (a DNA scissor technology) to cut the DNA into suitable strands and heat up the solution so that the double helix unwinds. Next, we prepare a bunch of already-known sequences of cancer genes and connect them with probes that are light emitting when the sequences are bound by its complementary sequence. By mixing the cancer gene sequences with the DNA solution, some of them combines and emits light. Our detector captures this light emission and determines whether a cancer gene is present. Due to the noise inherent in the experiment, this is actually a harder problem of noisy group testing.
 
@@ -53,7 +53,7 @@ And you are absolutely correct, the server indeed does not check the entire data
     \label{fig:w12_bloom_counter}
 \end{figure}
 
-\paragraph{Database summary:} Given a bloom filter, can we quickly summarize who is in the database? The answer is yes! Though up to a small chance of false positives. The simplest approach is to enumerate all possible accounts and check if they are in the database. If the format of the usernames is restricted, then the set of usernames is finite, and the algorithm converges... after a long time. Instead, we can use a bloom filter to quickly summarize the \textit{heavy hitters} in the database. The technique we will introduce now is called the ``count sketch" or the ``min count sketch", some other algorithms like GroTesQuE (group testing quick and efficient), AC/DC, SAFFRON can also be utilized. We will touch on a few of these methods in a later subsection.
+\paragraph{Database summary:} Given a bloom filter, can we quickly summarize who is in the database? The answer is yes! Though up to a small chance of false positives. The simplest approach is to enumerate all possible accounts and check if they are in the database. If the format of the usernames is restricted, then the set of usernames is finite, and the algorithm converges... after a long time. Instead, we can use a bloom filter to quickly summarize the \textit{heavy hitters} in the database. The technique we will introduce now is called the ``count sketch" or the ``min count sketch", some other algorithms like GroTesQuE (group testing quick and efficient) \cite{grotesque_GT}, AC-DC \cite{AC-DC_GT}, SAFFRON \cite{saffron_GT} can also be utilized. We will touch on a few of these methods in a later subsection.
 
 The count sketch method is basically just a bloom counter but with a really nice hash function. Consider having a string of 1000 integers ($\mathbb{Z}^{1000}$), we will now describe the procedure and details of adding an item into the database and summarizing the whole database.
 \begin{enumerate}[label=(\arabic*)]
@@ -111,17 +111,76 @@ The count sketch method is basically just a bloom counter but with a really nice
 \end{enumerate}
 
 
-\subsection{Binary Search + Group Testing}
+\subsection{Binary Search + Group Testing} \label{sec:w12_bin_GT}
 The tactics and algorithms for group testing are vast, for further reading, one can refer to the references \cite{CombinatorialGT_SparseRecovery,NoisyNonadaptiveGT,Quickly_Decodable_GT}.
 
-{\color{red}Below, we start our discussion of the na\"ive tactic of binary search. }
+Below, we start our discussion of the na\"ive tactic of binary search. We first separate the population into two halves, then conduct group testing on both halves. Depending on which half being positive on the first round of tests, we continue on with the second round of tests on it. The amount of tests required is of order $O(\log n)$. This scheme is \textit{adaptive}, since one saw the test results before conducting further tests. In practical cases, this means that this scheme takes a longer time to conduct since it requires so many stages, which is not ideal, we aim for single round group testing which is non-adaptive.
 
+The following discussion follows mainly from the work by Wang, Gabrys, and Guruswami \cite{Quickly_Decodable_GT}. A non-adaptive scheme for group testing is by binary search. Any binary search is a binary tree.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/w12_bin_tree_GT.png}
+    \caption{Binary search for group testing. The amount of tests required can be greatly reduced by folding the tree.}
+    \label{fig:w12_bin_tree_GT}
+\end{figure}
 
+Normally, a non-adaptive group testing on a binary tree requires $O(n\lg n)$ tests. By simply folding the tree, however, one can devise a scheme that requires only $O(k\lg n)$ tests, this is also the information theoretical limit. See \autoref{fig:w12_bin_tree_GT}, each red box is a single test, testing all the leaves of the nodes within it. By pruning the tree with the negative tests, we should be able to find the infected population.
+
+Tracing from the root to the leaves, one can construct a watch list $W$ of all the people suspected to be infected. For simplicity, let both $n$ and $k$ be a power of two, then each person is labeled by a bit string in $\{0,1\}^{\lg n}$. For each layer $j$, $W_j$ contains the prefixes of the $k$ sick people and with some healthy people that are still suspicious \includegraphics[height=1em]{figures/w12_sus.png}. At the first layer (the root), we have $W_1 = \{0,1\}$ since the test on the root must be positive ($k>0$). Then, on the second layer, $W_2 = \setdef{a0,a1}{a\in W_1, a \text{ is in a positive test}}$. Continue on, we have
+\begin{equation}
+    W_{j+1} = \setdef{a0,a1}{a\in W_j, a \text{ is in a positive test}}.
+\end{equation}
+At each level, we use $16k$ tests (so that the width to the right figure of \autoref{fig:w12_bin_tree_GT} is $16k=O(k)$). Let $w_j = \abs{W_j}$, 
+\begin{equation}
+    w_{j+1} = k + \mathrm{Ber}\left(2(w_j-k),\frac{1}{16}\right),
+\end{equation}
+where the probability $\frac{1}{16}$ is due to the fact that: there are $16k$ tests each layer, and there are $k$ infected person, the probability that each prefix contains no infected person will be pruned away is $15/16$.
+
+\begin{definition}[Probability Generating Function]
+    For a discrete random variable $X$ defined on non-negative integers, its probability generating function is defined as
+    \begin{equation}
+        F_X(x) = \sum_{\ell=0}^{\infty} \mathrm{Pr}\{X=\ell\} x^\ell.
+    \end{equation}
+\end{definition}
+To facilitate discussion, let us define the \textit{excess size} of the watch list as $N_j \defeq w_j-k$ and $F_j = F_{N_j}$. We will also assume that each prefix of length $\lg k$ contains exactly one infected person, then
+\begin{align}
+    F_{\lg k}(x) &= 1, \\
+    F_{j+1}(x) &= F_{j}\left(\frac{15}{16} + \frac{x^2}{16}\right) \cdot x^k. \label{eq:w12_branching}
+\end{align}
+\autoref{eq:w12_branching} defines a branching process, where with probability $\frac{15}{16}$ a suspicious prefix proves to be innocent, but with probability $\frac{1}{16}$ the number of suspected prefixes doubles. The term $x^k$ means that the $k$ infected people will each result in an innocent prefix.
+
+Let us study the evolution of $F_j$. Define $f(x) = \frac{15}{16} + \frac{x^2}{16}$, such that
+\begin{equation}
+    F_{j+1}(x) = x^k \cdot f^k(x) \cdot \left(f^{\circ2}(x)\right)^k \cdot \left(f^{\circ3}(x)\right)^k \cdot \cdots \cdot \left(f^{\circ j}(x)\right)^k.
+\end{equation}
+The function $f$ is not entirely easy to iterate, hence we consider using a M\"obius transform $g$ to approximate it:
+\begin{equation}
+    g(x) \defeq \frac{6}{y-x} = f(x) + \underbrace{\frac{(x-1)(x-3)^2}{16(7-x)}}_{>0 \text{ for }x\in(1,6)}.
+\end{equation}
+Then
+\begin{equation}
+    g^{\circ j}(x) = 1 + \frac{5(x-1)}{6^j(6-x) + (x-1)},
+\end{equation}
+in particular $g^{\circ j}(5) \approx 1 + \frac{1}{6^j}$. Hence, we can bound $F_j$ by
+\begin{equation*}
+    F_j(5) \le \prod_{i=0}^{j} g^{\circ i}(5)^k \le \prod_{i=0}^{j} \left(1 + \frac{20}{6^i+4}\right)^k \le \prod_{i=0}^{j}\exp\left(\frac{20}{6^i+4}\right)^k \le \exp(7k).
+\end{equation*}
+Then we can bound $w_j$ by using the Chernoff bound:
+\begin{equation*}
+    \mathrm{Pr}\{w_j-k \ge 5k\} \le \frac{F_j(5)}{5^{5k}} \le \ee^{-k}.
+\end{equation*}
+With high probability, we have $\abs{W_j}\le 6k$. Our next goal will be to reduce the $6k$ down to $k$. Which can be done by random testing on these $6k$ people. Those $5k$ people that are innocent will quickly be found out.
+
+Now that we have controlled $\abs{W_j}$, we are not satisfied, yet. We also want to control
+\begin{equation*}
+    \abs{W_1} + \abs{W_2} + \abs{W_3} + \cdots.
+\end{equation*}
+This is the idea of \textit{total progeny}: the sum of all the population from past to present. Our discussion is further aided by the following result.
 \begin{theorem}[Dwass] \label{thm:w12_Dwass}
-    The 
+    Let the total progeny of 
 \end{theorem}
 
 \begin{remark}
-    The original proof to \autoref{thm:w12_Dwass} is given by complex analysis. As a simple excercise, can you think of a combinatorial proof?
+    The original proof to \autoref{thm:w12_Dwass} is given by complex analysis. As a simple exercise, can you think of a combinatorial proof?
 \end{remark}

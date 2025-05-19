@@ -13,13 +13,9 @@ Our preferred combination would be to have a nonadaptive noiseless group testing
 
 The current state of the art can only achieve any combination of four of the above, but never all five.
 \begin{enumerate}
-    \item If we give up the first:
-
-
-    \item If we give up the second:
-
-
-    \item If we give up the third:
+    \item If we give up the first: then we can use the adaptive binary search method as introduced in the start of \autoref{sec:w12_bin_GT}.
+    \item If we give up the second: in GroTesQuE \cite{grotesque_GT} and SAFFRON \cite{saffron_GT}, we have the number of tests being $m=O(k\log k\log n)$.
+    \item If we give up the third: consider the binary tree folding as introduced in \autoref{sec:w12_bin_GT}. Normally when the tests are noiseless, we can cut all the leaves to a node if it is tested to be negative. However, for the case where the tests are noisy, say $\mathrm{BSC}(p)$-noisy, then we must do more tests to be sure. Setting a threshold for the amount the negative results that we accept it as truly being negative, {\color{red}the complexity becomes $p^{c\log k}$.}
 
 
     \item If we give up the fourth:
@@ -31,7 +27,185 @@ The current state of the art can only achieve any combination of four of the abo
 \end{enumerate}
 
 \section{Distributed Matrix Multiplication}
+Consider given the task of calculating the matrix product
+\begin{equation*}
+    \left[\begin{matrix}
+        A_{11} & A_{12} \\
+        A_{21} & A_{22}
+    \end{matrix}\right] \left[\begin{matrix}
+        B_{11} & B_{12} \\
+        B_{21} & B_{22}
+    \end{matrix}\right] = \left[\begin{matrix}
+        A_{11}\cdot B_{11} + A_{12}\cdot B_{21} & A_{11}\cdot B_{12} + A_{12}\cdot B_{22} \cdot \\
+        A_{21}\cdot B_{11} + A_{22}\cdot B_{21} & A_{21}\cdot B_{12} + A_{22}\cdot B_{22}
+    \end{matrix}\right],
+\end{equation*}
+it requires $8$ scalar multiplications. If we distribute this $8$ tasks to $8$ GPUs to compute and output the result only after all $8$ GPUs finish, our computation will be vulnerable when some GPUs are slow. This may be due to some randomness, overheating, power outage, or our favorite, Microsoft system auto-update.
+
+We can partition $A$ into
+\begin{equation*}
+    A = \left[\begin{matrix}
+        A_1 \\ A_2
+    \end{matrix}\right] \Rightarrow \tilde{A}_{2/3} \defeq \left[\begin{matrix}
+        A_1 \\ A_2 \\ A_1 + A_2
+    \end{matrix}\right].
+\end{equation*}
+If we compute the product $\tilde{A}B$, and distribute the task $A_1B$, $A_2B$, and $(A_1+A_2)B$ to three separate processors, we can recover $AB$ once any two finish. Since matrix addition is really cheap ($O(n)$) in comparison to multiplication ($O(n^3)$). We only care about reducing the multiplication count.
+
+Let us continue on with this strategy, and define
+\begin{equation*}
+    A = \left[\begin{matrix}
+        A_1 \\ A_2 \\ A_3
+    \end{matrix}\right] \Rightarrow \tilde{A}_{3/5} = \left[\begin{matrix}
+        A_1 \\ A_2 \\ A_3 \\ A_1+A_2+A_3 \\ A_1+2A_2+3A_3
+    \end{matrix}\right],
+\end{equation*}
+this is a 3-out-of-5 system (3/5-system). By incorporating more redundant tasks, we can prevent our computation being affected by slow GPUs. {\color{red}In fact, by employing an $[n,k]$-Reed--Solomon code, we can implement a $k/n$-system.}
+
+We can do better! Besides defining $\tilde{A}_{2/3}$, we also define $\tilde{B}_{2/3} = [B_1,B_2,B_1+B_2]$. Then we can use $9$ GPUs to compute $\tilde{A}_{2/3}\tilde{B}_{2/3}$, and requiring only $5$ of them to obtain $AB$. Its extension will be a two-dimensional Reed--Solomon code.
+
+In general, we find good matrices $G$ and $H$ as row and column operations, respectively, and compute
+\begin{equation}
+    \tilde{A}\tilde{B} = (GA)(BH).
+\end{equation}
+
+\subsection{Polynomial Codes}
+Let us introduce the method of polynomial codes \cite{polynomialcodes}: For $A$ and $B$ being $n\times n$ matrices, consider computing
+\begin{equation}
+    (\vec{g}_s\cdot A)(B\cdot \vec{h}_s)
+\end{equation}
+at the $s$th GPU, with vectors
+\begin{equation}
+    \vec{g}_s = \left[\begin{matrix}
+        1 & \xi_s & \cdots & \xi_s^{n-1}
+    \end{matrix}\right], \vec{h}_s = \left[\begin{matrix}
+        1 \\ \xi_s^n \\ \vdots \\ \xi_s^{n^2-n}
+    \end{matrix}\right],
+\end{equation}
+and $\xi_1$, $\ldots$, $\xi_s$, $\ldots$ are all distinct.
+
+\begin{theorem}[Polynomial Codes]
+    Any $n^2$ GPUs recovers $AB$.
+\end{theorem}
+\begin{proof}
+    Observe that
+    \begin{equation*}
+        \vec{g}_s\cdot AB\cdot \vec{h}_s = \trace{\vec{h}_s\vec{g}_s\cdot AB} = \langle \vec{h}_s\vec{g}_s,AB\rangle,
+    \end{equation*}
+    where $\langle\cdot,\cdot\rangle$ is the Frobenius inner product. Since $\vec{h}_s\vec{g}_s$ forms a matrix basis $X_s$: we can compute $n^2$ of
+    \begin{equation*}
+        \langle X_1,AB\rangle = \trace{X_1(AB)}, \langle X_2,AB\rangle = \trace{X_2(AB)}, \ldots
+    \end{equation*}
+    so as to finally obtain $AB$.
+\end{proof}
+
+\subsection{MatDot}
+Let us introduce the method of MatDot \cite{MatDot}\footnote{To be frank, I think the polynomial codes is more related to ``dot'' product.}: Let the $s$th CPU compute the product
+\begin{equation}
+    A\vec{x}_s\vec{y}_sB,
+\end{equation}
+with $\vec{x}_s = [1,\xi_s,\ldots,\xi_s^{n-1}]^\transpose$ and $\vec{y}_s = [\xi_s^{n-1},\ldots,\xi_s,1]$. Again, all the $\xi_s$'s are distinct.
+
+\begin{theorem}[MatDot]
+    Any $(2n-1)$-subset of $A\vec{x}_s\vec{y}_sB$ recovers $AB$.
+\end{theorem}
+\begin{proof}
+    Observe that
+    \begin{equation*}
+        \vec{x}_s\vec{y}_s = \left[\begin{matrix}
+            \xi_s^{n-1} & \cdots & \xi_s & 1 \\
+            \vdots & \ddots & & \xi_s \\
+            \xi_s^{2n-3} & & \ddots & \vdots \\
+            \xi_s^{2n-2} & \xi_s^{2n-3} & \cdots & \xi_s^{n-1}
+        \end{matrix}\right]
+    \end{equation*}
+    is a Toeplitz matrix. And any $(2n-1)$-subset of $A\vec{x}_s\vec{y}_sB$ spans all Toeplitz matrix, which includes the identity matrix $\mathbbm{1}$. Henceforth, we can obtain $A\mathbbm{1}B=AB$ from linear combinations of $2n-1$ $A\vec{x}_s\vec{y}_sB$'s.
+\end{proof}
+
+\subsection{Strassen's Method}
+The classical method for fast $2\times2$ matrix multiplication is the Strassen method, requiring only $7$ scalar multiplications. See the terms below
+\begin{align*}
+    S^{(1)} &= (A_{11} + A_{22}) (B_{11} + B_{22}), \\
+    S^{(2)} &= (A_{21} + A_{22}) B_{11}, \\
+    S^{(3)} &= A_{11} (B_{12} - B_{22}), \\
+    S^{(4)} &= A_{22} (-B_{11} + B_{21}), \\
+    S^{(5)} &= (A_{11} + A_{12}) B_{22}, \\
+    S^{(6)} &= (-A_{21} + A_{11}) (B_{11} + B_{12}), \\
+    S^{(7)} &= (A_{12} - A_{22}) (B_{21} + B_{22}).
+\end{align*}
+Let $C=AB$, then
+\begin{align*}
+    C_{11} &= S^{(1)} + S^{(4)} - S^{(5)} + S^{(7)}, \\
+    C_{12} &= S^{(3)} + S^{(5)}, \\
+    C_{21} &= S^{(2)} + S^{(4)}, \\
+    C_{22} &= S^{(1)} - S^{(2)} + S^{(3)} + S^{(6)}.
+\end{align*}
+
+If we want to extend Strassen's method to distributed computing, we should add some redundancy: consider
+\begin{align*}
+    S^{(8)} &= (A_{11} + 2 A_{21}) (-B_{11} + B_{12}), \\
+    S^{(9)} &= (A_{12} + 2 A_{22}) (-B_{21} + B_{22}).
+\end{align*}
+
+\begin{theorem}
+    Any $8$ of $S^{(i)}$'s recover $C=AB$.
+\end{theorem}
+\begin{proof}
+    Consider the product:
+    \begin{equation*}
+        \text{linear combination of $C_{ij}$'s} = \left[\begin{matrix}
+            1 & 2
+        \end{matrix}\right] C \left[\begin{matrix}
+            -1 \\ 1
+        \end{matrix}\right] = S^{(8)} + S^{(9)} = \text{linear combination of $S^{(1)}$ to $S^{(7)}$},
+    \end{equation*}
+    where the last equality is by knowing that the Strassen's method works. The linear combination is
+    \begin{equation}
+        (1,-4,3,-3,2,2,-1)\cdot(S^{(1)},\ldots,S^{(7)}) = S^{(8)} + S^{(9)}.
+    \end{equation}
+    Henceforth, if any single one of the $S^{(i)}$'s is missing, we can use the above linear equation to recover it.
+
+    If we want to counter $2$ missing data, we can construct
+    \begin{equation*}
+        \left[\begin{matrix}
+            3 & -1
+        \end{matrix}\right] C \left[\begin{matrix}
+            1 \\ 2
+        \end{matrix}\right] = S^{(10)} + S^{(11)}.
+    \end{equation*}
+    Then we just need to solve
+    \begin{equation}
+        \left[\begin{array}{ccccccc:cccc}
+            1 & -4 & 3 & -3 & 2 & 2 & -1 & -1 & -1 & 0 & 0 \\
+            1 & 1 & 4 & 2 & 3 & -2 & 3 & 0 & 0 & -1 & -1
+        \end{array}\right] \left[\begin{array}{c}
+            S^{(1)} \\ \vdots \\ S^{(7)} \\ \hdashline S^{(8)} \\ \vdots \\ S^{(11)}
+        \end{array}\right] = 0 \label{eq:w13_distributed_Strassen}
+    \end{equation}
+    to recover the missing terms. This is possible due to the fact that any $2\times 2$ minor (containing at least one column from the first 7 columns) of the matrix on the left in \autoref{eq:w13_distributed_Strassen} is invertible.
+\end{proof}
+This set of combinations is found by brute force via a computer.
+
+
+
 
 \begin{remark}
-    Interestingly enough, just a few days after the lecture, the team of Google Deepmind published a result on fast matrix multiplication from their AI AlphaTensor on 15th of May, 2025. The traditional method of multiplying a $4\times4$ matrix using the Strassen method requires $49$ scalar multiplications. Amazingly, the method proposed by Deepmind requires only $48$ scalar multiplications! What a breakthrough.
+    It should be noted that Strassen's method is not optimal, as faster methods exist, such as the Coppersmith-Winograd method.
 \end{remark}
+
+\begin{remark}
+    Interestingly enough, just a few days after the lecture, the team of Google Deepmind published a result on fast matrix multiplication from their AI AlphaTensor on 15th of May, 2025. The traditional method of multiplying a $4\times4$ matrix using the Strassen's method requires $49$ scalar multiplications. Amazingly, the method proposed by Deepmind requires only $48$ scalar multiplications! What a breakthrough.
+\end{remark}
+
+\subsection{Laderman's Method}
+The Laderman's method \cite{Laderman3x3} deals with fast $3\times 3$ matrix multiplication, requiring only $23$ scalar multiplications! I will not explicitly write out the $23$ terms $L^{(1)}$ to $L^{(23)}$, however, we will discuss an extension of it to the distributed case.
+
+Compared to the direct method requiring $3^3=27$ multiplications, we can add $3$ more redundancies and still outperform direct computation. We can obtain $L^{(24)}$, $L^{(25)}$ and $L^{(26)}$ from the product
+\begin{equation}
+    \left[\begin{matrix}
+        2 & 1 & 3
+    \end{matrix}\right] C \left[\begin{matrix}
+        2 \\ -1 \\ 3
+    \end{matrix}\right] = L^{(24)} + L^{(25)} + L^{(26)},
+\end{equation}
+just like what we did for the distributed case of Strassen's method.
